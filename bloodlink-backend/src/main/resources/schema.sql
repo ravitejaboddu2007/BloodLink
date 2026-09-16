@@ -1,6 +1,4 @@
--- BloodLink Database Schema Definition (Step 3 Foundation)
-CREATE DATABASE IF NOT EXISTS bloodlink;
-USE bloodlink;
+
 
 -- 1. Users Table
 CREATE TABLE IF NOT EXISTS users (

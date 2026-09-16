@@ -5,7 +5,7 @@
 const API_BASE =
   (typeof window !== "undefined" &&
     (window.BLOODLINK_API_BASE || window.API_BASE)) ||
-  "http://localhost:8080";
+  "https://bloodlink-production-ddab.up.railway.app";
 
 /* ── DB (Session Management) ── */
 const DB = {
@@ -170,19 +170,45 @@ function dist(la1, lo1, la2, lo2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 function elig(d, nextEligDate) {
-  if (!d) return { ok: true, msg: "No donation history — you are eligible!", days: 0, left: 0, lastDonation: "", nextEligible: "" };
+  if (!d)
+    return {
+      ok: true,
+      msg: "No donation history — you are eligible!",
+      days: 0,
+      left: 0,
+      lastDonation: "",
+      nextEligible: "",
+    };
   try {
-    const dDate = typeof d === "string" && d.includes("T") ? new Date(d) : new Date(d + "T00:00:00");
+    const dDate =
+      typeof d === "string" && d.includes("T")
+        ? new Date(d)
+        : new Date(d + "T00:00:00");
     let nextDate;
     if (nextEligDate) {
-      nextDate = typeof nextEligDate === "string" && nextEligDate.includes("T") ? new Date(nextEligDate) : new Date(nextEligDate + "T00:00:00");
+      nextDate =
+        typeof nextEligDate === "string" && nextEligDate.includes("T")
+          ? new Date(nextEligDate)
+          : new Date(nextEligDate + "T00:00:00");
     } else {
       nextDate = new Date(dDate.getTime() + 90 * 86400000);
     }
     const now = new Date();
-    const todayZero = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const dZero = new Date(dDate.getFullYear(), dDate.getMonth(), dDate.getDate());
-    const nextZero = new Date(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate());
+    const todayZero = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
+    const dZero = new Date(
+      dDate.getFullYear(),
+      dDate.getMonth(),
+      dDate.getDate(),
+    );
+    const nextZero = new Date(
+      nextDate.getFullYear(),
+      nextDate.getMonth(),
+      nextDate.getDate(),
+    );
 
     const daysSince = Math.round((todayZero - dZero) / 86400000);
     const leftDays = Math.round((nextZero - todayZero) / 86400000);
@@ -197,7 +223,7 @@ function elig(d, nextEligDate) {
         days: daysSince,
         left: 0,
         lastDonation: d,
-        nextEligible: nextStr
+        nextEligible: nextStr,
       };
     } else {
       return {
@@ -206,11 +232,18 @@ function elig(d, nextEligDate) {
         days: daysSince,
         left: leftDays,
         lastDonation: d,
-        nextEligible: nextStr
+        nextEligible: nextStr,
       };
     }
   } catch {
-    return { ok: true, msg: "Eligibility check completed.", days: 0, left: 0, lastDonation: d, nextEligible: "" };
+    return {
+      ok: true,
+      msg: "Eligibility check completed.",
+      days: 0,
+      left: 0,
+      lastDonation: d,
+      nextEligible: "",
+    };
   }
 }
 function bgClass(g) {
@@ -319,31 +352,30 @@ function saveBloodBankInventory(bloodBankId, stock, lastUpdated) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     },
-  )
-    .then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        const err = data.error || "Failed to update inventory in database";
-        toast(err, "err");
-        throw new Error(err);
-      }
-      const data = await res.json();
-      const updatedStock = { ...emptyBloodStock(), ...(data.stock || {}) };
-      const updatedReservedStock = {
-        ...emptyBloodStock(),
-        ...(data.reservedStock || {}),
-      };
-      const updatedLastUpdated = {
-        ...emptyLastUpdated(),
-        ...(data.lastUpdated || {}),
-      };
-      bloodBankInventoriesCache[bloodBankId] = {
-        stock: updatedStock,
-        reservedStock: updatedReservedStock,
-        lastUpdated: updatedLastUpdated,
-      };
-      return bloodBankInventoriesCache[bloodBankId];
-    });
+  ).then(async (res) => {
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const err = data.error || "Failed to update inventory in database";
+      toast(err, "err");
+      throw new Error(err);
+    }
+    const data = await res.json();
+    const updatedStock = { ...emptyBloodStock(), ...(data.stock || {}) };
+    const updatedReservedStock = {
+      ...emptyBloodStock(),
+      ...(data.reservedStock || {}),
+    };
+    const updatedLastUpdated = {
+      ...emptyLastUpdated(),
+      ...(data.lastUpdated || {}),
+    };
+    bloodBankInventoriesCache[bloodBankId] = {
+      stock: updatedStock,
+      reservedStock: updatedReservedStock,
+      lastUpdated: updatedLastUpdated,
+    };
+    return bloodBankInventoriesCache[bloodBankId];
+  });
 }
 function fmtDateTime(isoStr) {
   if (!isoStr) return "Not updated yet";
@@ -421,9 +453,12 @@ function updateStats() {
   apiFetch(`${API_BASE}/api/users/stats`)
     .then((res) => res.json())
     .then((data) => {
-      if (d && typeof data.donors === "number") d.textContent = data.donors.toLocaleString();
-      if (h && typeof data.hospitals === "number") h.textContent = data.hospitals.toLocaleString();
-      if (b && typeof data.bloodbanks === "number") b.textContent = data.bloodbanks.toLocaleString();
+      if (d && typeof data.donors === "number")
+        d.textContent = data.donors.toLocaleString();
+      if (h && typeof data.hospitals === "number")
+        h.textContent = data.hospitals.toLocaleString();
+      if (b && typeof data.bloodbanks === "number")
+        b.textContent = data.bloodbanks.toLocaleString();
     })
     .catch(() => {});
 
@@ -489,7 +524,8 @@ function renderLandingTicker() {
       .then((res) => res.json())
       .catch(() => ({ count: 0 })),
   ]).then(([userData, reqData, invData]) => {
-    const donorCount = typeof userData.donors === "number" ? userData.donors : 0;
+    const donorCount =
+      typeof userData.donors === "number" ? userData.donors : 0;
     const reqCount = typeof reqData.count === "number" ? reqData.count : 0;
     const invCount = typeof invData.count === "number" ? invData.count : 0;
     buildTicker(donorCount, reqCount, invCount);
@@ -687,7 +723,9 @@ async function renderReviewsHub() {
   try {
     const [allRes, myRes] = await Promise.all([
       apiFetch(`${API_BASE}/api/reviews`).catch(() => null),
-      CU ? apiFetch(`${API_BASE}/api/reviews/user/${CU.id}`).catch(() => null) : Promise.resolve(null),
+      CU
+        ? apiFetch(`${API_BASE}/api/reviews/user/${CU.id}`).catch(() => null)
+        : Promise.resolve(null),
     ]);
 
     const allReviews = allRes && allRes.ok ? await allRes.json() : [];
@@ -722,7 +760,11 @@ async function renderReviewsHub() {
       if (myReview.createdAt) {
         try {
           const d = new Date(myReview.createdAt);
-          dateStr = d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+          dateStr = d.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
         } catch {
           dateStr = myReview.createdAt;
         }
@@ -740,7 +782,7 @@ async function renderReviewsHub() {
           <p class="tq" style="margin-bottom:16px;font-size:15.5px">"${esc(myReview.text)}"</p>
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding-top:12px;border-top:1px solid var(--border)">
             <div class="ta" style="gap:10px">
-              <div class="tav" style="background:${myReview.role === 'donor' ? 'var(--crimson)' : myReview.role === 'hospital' ? 'var(--sapphire)' : 'var(--emerald)'}">
+              <div class="tav" style="background:${myReview.role === "donor" ? "var(--crimson)" : myReview.role === "hospital" ? "var(--sapphire)" : "var(--emerald)"}">
                 ${(myReview.name || "?")[0].toUpperCase()}
               </div>
               <div>
@@ -801,17 +843,21 @@ async function renderReviewsHub() {
         if (rev.createdAt) {
           try {
             const d = new Date(rev.createdAt);
-            dateStr = d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+            dateStr = d.toLocaleDateString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            });
           } catch {
             dateStr = rev.createdAt;
           }
         }
 
         commHtml += `
-          <div class="testi" style="position:relative;${isMe ? 'border: 1.5px solid var(--border-focus);' : ''}">
+          <div class="testi" style="position:relative;${isMe ? "border: 1.5px solid var(--border-focus);" : ""}">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
               <div style="color:#F59E0B;font-size:16px;letter-spacing:2px">${stars}</div>
-              <span class="badge ${badgeClass}">${roleIcon} ${isMe ? 'You (' + roleText + ')' : roleText}</span>
+              <span class="badge ${badgeClass}">${roleIcon} ${isMe ? "You (" + roleText + ")" : roleText}</span>
             </div>
             <p class="tq">"${esc(rev.text)}"</p>
             <div class="ta" style="justify-content:space-between">
@@ -1181,7 +1227,10 @@ function doSignup(role) {
         login(data);
       })
       .catch(() => {
-        toast("Registration failed. Please check your connection and try again.", "err");
+        toast(
+          "Registration failed. Please check your connection and try again.",
+          "err",
+        );
       });
   } else if (role === "hospital") {
     const ids = [
@@ -1291,7 +1340,10 @@ function doSignup(role) {
         login(data);
       })
       .catch(() => {
-        toast("Registration failed. Please check your connection and try again.", "err");
+        toast(
+          "Registration failed. Please check your connection and try again.",
+          "err",
+        );
       });
   } else if (role === "bloodbank") {
     doSignupBloodBank();
@@ -1416,7 +1468,10 @@ function doSignupBloodBank() {
       login(data);
     })
     .catch(() => {
-      toast("Registration failed. Please check your connection and try again.", "err");
+      toast(
+        "Registration failed. Please check your connection and try again.",
+        "err",
+      );
     });
 }
 /* ── LOCATION FRESHNESS & LOCATION UPDATE SYSTEM ── */
@@ -1472,7 +1527,6 @@ function getLocationFreshness(u) {
     };
   }
 }
-
 
 /* Reverse geocodes lat/lng into City and State */
 async function fetchReverseGeocode(lat, lng) {
@@ -1560,19 +1614,16 @@ async function updateCurrentLocationManually() {
     const loc = await getCurrentLocationWithAddress();
 
     if (CU.role === "donor") {
-      const res = await apiFetch(
-        `${API_BASE}/api/donors/${CU.id}/location`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            lat: loc.lat,
-            lng: loc.lng,
-            city: loc.city || null,
-            state: loc.state || null,
-          }),
-        },
-      );
+      const res = await apiFetch(`${API_BASE}/api/donors/${CU.id}/location`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lat: loc.lat,
+          lng: loc.lng,
+          city: loc.city || null,
+          state: loc.state || null,
+        }),
+      });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -2201,29 +2252,27 @@ function renderDDash() {
     }
   }
 
-  Promise.all([
-    fetchDonationHistory(CU.id),
-    fetchDonorAlerts(),
-  ]).then(([hist, alerts]) => {
-    const pend = alerts.filter((a) => a.dStatus === "pending").length;
-    const lastD = CU.lastDonation || getLastHist();
-    const r = elig(lastD, CU.nextEligibleDate);
+  Promise.all([fetchDonationHistory(CU.id), fetchDonorAlerts()]).then(
+    ([hist, alerts]) => {
+      const pend = alerts.filter((a) => a.dStatus === "pending").length;
+      const lastD = CU.lastDonation || getLastHist();
+      const r = elig(lastD, CU.nextEligibleDate);
 
-    $("d-stats").innerHTML = `
+      $("d-stats").innerHTML = `
       <div class="sc"><div class="sc-n r">${hist.length}</div><div class="sc-l">Donations</div></div>
       <div class="sc"><div class="sc-n a">${pend}</div><div class="sc-l">Pending Alerts</div></div>
       <div class="sc"><div class="sc-n g">${alerts.filter((a) => a.dStatus === "accepted").length}</div><div class="sc-l">Accepted</div></div>
       <div class="sc"><div class="sc-n ${!r.ok ? "a" : CU.available ? "g" : "r"}">${!r.ok ? "Resting" : CU.available ? "Active" : "Inactive"}</div><div class="sc-l">My Status</div></div>`;
-    $("d-qa").innerHTML = `
+      $("d-qa").innerHTML = `
       <div class="qa-btn qg" onclick="updateCurrentLocationManually()"><div class="qa-icon">📍</div><div class="qa-label">Update Location</div><div class="qa-sub">${freshInfo.formattedTime}</div></div>
       <div class="qa-btn qr" onclick="showPage('d-alerts')"><div class="qa-icon">🔔</div><div class="qa-label">Alerts</div><div class="qa-sub">${pend} pending</div></div>
       <div class="qa-btn" onclick="openModal('modal-log')"><div class="qa-icon">📅</div><div class="qa-label">Log Donation</div><div class="qa-sub">Record it</div></div>
       <div class="qa-btn" onclick="showPage('d-profile')"><div class="qa-icon">👤</div><div class="qa-label">Profile</div><div class="qa-sub">Update details</div></div>`;
-    
-    const ee = $("d-elig");
-    if (ee) {
-      if (!r.ok) {
-        ee.innerHTML = `
+
+      const ee = $("d-elig");
+      if (ee) {
+        if (!r.ok) {
+          ee.innerHTML = `
           <div class="card" style="background:var(--am-pale);border:1.5px solid var(--am-mid);padding:16px;border-radius:12px;margin-bottom:0">
             <div style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap">
               <div style="font-size:32px;line-height:1">⏳</div>
@@ -2253,61 +2302,62 @@ function renderDDash() {
               </div>
             </div>
           </div>`;
-      } else if (CU.available) {
-        ee.innerHTML = `<div class="elig-res elig-ok" style="display:block"><strong>🟢 Available for Donation</strong> — You are eligible and willing to donate.${r.days > 0 ? ` (${r.days} days since last donation)` : ""}</div>`;
-      } else {
-        ee.innerHTML = `<div class="elig-res" style="display:block;background:var(--border-l);border:1px solid var(--border);color:var(--text)"><strong>⚪ Not Available</strong> — You are eligible to donate, but your availability preference is OFF.</div>`;
+        } else if (CU.available) {
+          ee.innerHTML = `<div class="elig-res elig-ok" style="display:block"><strong>🟢 Available for Donation</strong> — You are eligible and willing to donate.${r.days > 0 ? ` (${r.days} days since last donation)` : ""}</div>`;
+        } else {
+          ee.innerHTML = `<div class="elig-res" style="display:block;background:var(--border-l);border:1px solid var(--border);color:var(--text)"><strong>⚪ Not Available</strong> — You are eligible to donate, but your availability preference is OFF.</div>`;
+        }
       }
-    }
-    const pl = $("d-pending");
-    const pa = alerts.filter((a) => a.dStatus === "pending").slice(0, 3);
-    pl.innerHTML = pa.length
-      ? pa.map((a) => alertCard(a, true)).join("") +
-        (pend > 3
-          ? `<button class="btn ghost sm" style="margin-top:8px" onclick="showPage('d-alerts')">View all ${pend} →</button>`
-          : ``)
-      : empty(
-          "🔔",
-          "No Pending Alerts",
-          "You'll be notified when hospitals need your blood type.",
+      const pl = $("d-pending");
+      const pa = alerts.filter((a) => a.dStatus === "pending").slice(0, 3);
+      pl.innerHTML = pa.length
+        ? pa.map((a) => alertCard(a, true)).join("") +
+          (pend > 3
+            ? `<button class="btn ghost sm" style="margin-top:8px" onclick="showPage('d-alerts')">View all ${pend} →</button>`
+            : ``)
+        : empty(
+            "🔔",
+            "No Pending Alerts",
+            "You'll be notified when hospitals need your blood type.",
+          );
+      const ac = $("d-activity");
+      if (ac) {
+        const items = [];
+        hist.slice(0, 3).forEach((h) =>
+          items.push({
+            t: h.createdAt,
+            i: "🩸",
+            bg: "var(--cr-pale)",
+            txt: `<strong>Donated</strong> at ${esc(h.location)}`,
+            meta: fmt(h.date),
+          }),
         );
-    const ac = $("d-activity");
-    if (ac) {
-      const items = [];
-      hist.slice(0, 3).forEach((h) =>
-        items.push({
-          t: h.createdAt,
-          i: "🩸",
-          bg: "var(--cr-pale)",
-          txt: `<strong>Donated</strong> at ${esc(h.location)}`,
-          meta: fmt(h.date),
-        }),
-      );
-      alerts.slice(0, 3).forEach((a) => {
-        items.push({
-          t: a.createdAt,
-          i: "🔔",
-          bg: "var(--am-pale)",
-          txt: `<strong>Alert</strong> from ${esc(a.hospitalName || "Hospital")} — ${esc(a.bloodGroup)}`,
-          meta: ago(a.createdAt),
+        alerts.slice(0, 3).forEach((a) => {
+          items.push({
+            t: a.createdAt,
+            i: "🔔",
+            bg: "var(--am-pale)",
+            txt: `<strong>Alert</strong> from ${esc(a.hospitalName || "Hospital")} — ${esc(a.bloodGroup)}`,
+            meta: ago(a.createdAt),
+          });
         });
-      });
-      items.sort((a, b) => new Date(b.t) - new Date(a.t));
-      ac.innerHTML =
-        items
-          .slice(0, 5)
-          .map(
-            (x) =>
-              `<div class="act-item"><div class="act-icon" style="background:${x.bg}">${x.i}</div><div><div class="act-text">${x.txt}</div><div class="act-time">${x.meta}</div></div></div>`,
-          )
-          .join("") ||
-        empty(
-          "📊",
-          "No Activity Yet",
-          "Your donations and alerts will appear here.",
-        );
-    }
-  });
+        items.sort((a, b) => new Date(b.t) - new Date(a.t));
+        ac.innerHTML =
+          items
+            .slice(0, 5)
+            .map(
+              (x) =>
+                `<div class="act-item"><div class="act-icon" style="background:${x.bg}">${x.i}</div><div><div class="act-text">${x.txt}</div><div class="act-time">${x.meta}</div></div></div>`,
+            )
+            .join("") ||
+          empty(
+            "📊",
+            "No Activity Yet",
+            "Your donations and alerts will appear here.",
+          );
+      }
+    },
+  );
 }
 let donorAlertsCache = [];
 let donorHistoryCache = [];
@@ -2440,7 +2490,14 @@ function triggerLocationUpdateOnAlertInteraction() {
     async (pos) => {
       const lat = Number(pos.coords.latitude.toFixed(6));
       const lng = Number(pos.coords.longitude.toFixed(6));
-      if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      if (
+        isNaN(lat) ||
+        isNaN(lng) ||
+        lat < -90 ||
+        lat > 90 ||
+        lng < -180 ||
+        lng > 180
+      ) {
         return;
       }
 
@@ -2458,7 +2515,12 @@ function triggerLocationUpdateOnAlertInteraction() {
       apiFetch(`${API_BASE}/api/donors/${CU.id}/location`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lat: lat, lng: lng, city: CU.city, state: CU.state }),
+        body: JSON.stringify({
+          lat: lat,
+          lng: lng,
+          city: CU.city,
+          state: CU.state,
+        }),
       }).catch(() => {});
 
       saveUser();
@@ -2468,7 +2530,7 @@ function triggerLocationUpdateOnAlertInteraction() {
     (err) => {
       // Graceful fallback: Do NOT create fake/zero coordinates or block alert workflow
     },
-    { timeout: 8000, enableHighAccuracy: true, maximumAge: 60000 }
+    { timeout: 8000, enableHighAccuracy: true, maximumAge: 60000 },
   );
 }
 
@@ -2575,12 +2637,7 @@ function respondAlert(reqId, status) {
       if (normalizedStatus === "accepted" && resData.distance != null) {
         acceptMsg = `✅ Accepted! Distance: ${resData.distance} km. Hospital will contact you.`;
       }
-      toast(
-        normalizedStatus === "accepted"
-          ? acceptMsg
-          : "Declined.",
-        "ok",
-      );
+      toast(normalizedStatus === "accepted" ? acceptMsg : "Declined.", "ok");
       fetchDonorAlerts().then(() => {
         renderDAlerts();
         renderDDash();
@@ -2849,9 +2906,7 @@ function renderHDash() {
     const grps = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
     $("h-blood-inv").innerHTML = grps
       .map((g) => {
-        const cnt = donors.filter(
-          (d) => d.bloodGroup === g,
-        ).length;
+        const cnt = donors.filter((d) => d.bloodGroup === g).length;
         const clr =
           cnt === 0
             ? "#EF4444"
@@ -3130,7 +3185,6 @@ async function matchBloodBanksForBloodRequest(requestId) {
   return await res.json();
 }
 
-
 function renderHRequest() {
   if (!CU) return;
   if ($("hr-contact")) {
@@ -3159,7 +3213,7 @@ function sendRequest() {
     reason = gv("hr-reason"),
     opTime = gv("hr-op-time"),
     deadline = gv("hr-deadline"),
-    ct = (CU && CU.phone) ? CU.phone.trim() : gv("hr-contact"),
+    ct = CU && CU.phone ? CU.phone.trim() : gv("hr-contact"),
     notes = gv("hr-notes");
 
   let ok = true;
@@ -3245,8 +3299,7 @@ function sendRequest() {
     requestType: reqType,
     reason: reqType === "SCHEDULED" ? reason.trim() : null,
     operationTime: reqType === "SCHEDULED" && opTime ? opTime : null,
-    accumulationDeadline:
-      reqType === "SCHEDULED" && deadline ? deadline : null,
+    accumulationDeadline: reqType === "SCHEDULED" && deadline ? deadline : null,
   };
 
   apiFetch(`${API_BASE}/api/requests`, {
@@ -3276,114 +3329,117 @@ function sendRequest() {
         console.error("Failed to match blood banks from server:", err);
       }
 
-          // Persist matched blood banks to MySQL request_blood_banks
-          if (structuredBanks && structuredBanks.length > 0) {
-            apiFetch(
-              `${API_BASE}/api/requests/${encodeURIComponent(data.id)}/bloodbanks`,
+      // Persist matched blood banks to MySQL request_blood_banks
+      if (structuredBanks && structuredBanks.length > 0) {
+        apiFetch(
+          `${API_BASE}/api/requests/${encodeURIComponent(data.id)}/bloodbanks`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              bloodBanks: structuredBanks.map((sb) => ({
+                bloodBankId: sb.id,
+                distance: sb.distance,
+                availableUnitsAtMatch: sb.availableUnitsAtMatch,
+                status: sb.status,
+                responseStatus: sb.responseStatus,
+              })),
+            }),
+          },
+        ).catch(() => {});
+      }
+
+      let directDonors = [];
+      let waitingDonors = [];
+      let donorAlertsSent = false;
+
+      // For SCHEDULED requests: Automatically match and alert Donors immediately!
+      if (reqType === "SCHEDULED") {
+        try {
+          const donorMatches = await matchDonorsForBloodRequest(data.id);
+          directDonors = donorMatches.direct || [];
+          waitingDonors = donorMatches.waiting || [];
+
+          if (directDonors.length > 0 || waitingDonors.length > 0) {
+            const donorPayloadItems = [
+              ...directDonors.map((d) => ({
+                donorId: d.id,
+                alertType: "direct",
+              })),
+              ...waitingDonors.map((d) => ({
+                donorId: d.id,
+                alertType: "waiting",
+              })),
+            ];
+
+            await apiFetch(
+              `${API_BASE}/api/requests/${encodeURIComponent(data.id)}/alerts`,
               {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  bloodBanks: structuredBanks.map((sb) => ({
-                    bloodBankId: sb.id,
-                    distance: sb.distance,
-                    availableUnitsAtMatch: sb.availableUnitsAtMatch,
-                    status: sb.status,
-                    responseStatus: sb.responseStatus,
-                  })),
+                  donors: donorPayloadItems,
+                  remainingUnitsAtDonorAlert: units,
                 }),
               },
-            ).catch(() => {});
+            );
+            donorAlertsSent = true;
           }
-
-          let directDonors = [];
-          let waitingDonors = [];
-          let donorAlertsSent = false;
-
-          // For SCHEDULED requests: Automatically match and alert Donors immediately!
-          if (reqType === "SCHEDULED") {
-            try {
-              const donorMatches = await matchDonorsForBloodRequest(data.id);
-              directDonors = donorMatches.direct || [];
-              waitingDonors = donorMatches.waiting || [];
-
-              if (directDonors.length > 0 || waitingDonors.length > 0) {
-                const donorPayloadItems = [
-                  ...directDonors.map((d) => ({
-                    donorId: d.id,
-                    alertType: "direct",
-                  })),
-                  ...waitingDonors.map((d) => ({
-                    donorId: d.id,
-                    alertType: "waiting",
-                  })),
-                ];
-
-                await apiFetch(
-                  `${API_BASE}/api/requests/${encodeURIComponent(data.id)}/alerts`,
-                  {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      donors: donorPayloadItems,
-                      remainingUnitsAtDonorAlert: units,
-                    }),
-                  },
-                );
-                donorAlertsSent = true;
-              }
-            } catch (err) {
-              console.error("Failed to match/alert donors for scheduled request:", err);
-            }
-          }
-
-          const req = {
-            ...data,
-            securedUnits: data.securedUnits || 0,
-            donorAlertsSent: donorAlertsSent,
-            directDonors: directDonors,
-            waitingDonors: waitingDonors,
-            bloodBanks: structuredBanks,
-          };
-
-          hospitalRequestsCache.unshift(req);
-
-          btn.disabled = false;
-          btn.textContent =
-            reqType === "SCHEDULED"
-              ? "📅 Create Scheduled Request & Match All"
-              : "🆘 Send Emergency Request";
-          toast(
-            reqType === "SCHEDULED"
-              ? "Scheduled blood request created! Blood Banks & Donors alerted 📅"
-              : "Blood request created successfully! 🩸",
-            "ok",
+        } catch (err) {
+          console.error(
+            "Failed to match/alert donors for scheduled request:",
+            err,
           );
-          showMatchResult(req, structuredBanks);
+        }
+      }
 
-          [
-            "hr-patient",
-            "hr-bg",
-            "hr-units",
-            "hr-urgency",
-            "hr-reason",
-            "hr-op-time",
-            "hr-deadline",
-            "hr-notes",
-          ].forEach((id) => sv(id, ""));
-          sv("hr-contact", (CU && CU.phone) ? CU.phone : "");
-        })
-        .catch(() => {
-          btn.disabled = false;
-          btn.textContent =
-            reqType === "SCHEDULED"
-              ? "📅 Create Scheduled Request & Match All"
-              : "🆘 Send Emergency Request";
-          toast(
-            "Failed to create blood request. Please check backend connection.",
-            "err",
-          );
-        });
+      const req = {
+        ...data,
+        securedUnits: data.securedUnits || 0,
+        donorAlertsSent: donorAlertsSent,
+        directDonors: directDonors,
+        waitingDonors: waitingDonors,
+        bloodBanks: structuredBanks,
+      };
+
+      hospitalRequestsCache.unshift(req);
+
+      btn.disabled = false;
+      btn.textContent =
+        reqType === "SCHEDULED"
+          ? "📅 Create Scheduled Request & Match All"
+          : "🆘 Send Emergency Request";
+      toast(
+        reqType === "SCHEDULED"
+          ? "Scheduled blood request created! Blood Banks & Donors alerted 📅"
+          : "Blood request created successfully! 🩸",
+        "ok",
+      );
+      showMatchResult(req, structuredBanks);
+
+      [
+        "hr-patient",
+        "hr-bg",
+        "hr-units",
+        "hr-urgency",
+        "hr-reason",
+        "hr-op-time",
+        "hr-deadline",
+        "hr-notes",
+      ].forEach((id) => sv(id, ""));
+      sv("hr-contact", CU && CU.phone ? CU.phone : "");
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.textContent =
+        reqType === "SCHEDULED"
+          ? "📅 Create Scheduled Request & Match All"
+          : "🆘 Send Emergency Request";
+      toast(
+        "Failed to create blood request. Please check backend connection.",
+        "err",
+      );
+    });
 }
 
 async function alertDonorsForRequest(reqId) {
@@ -3405,14 +3461,17 @@ async function alertDonorsForRequest(reqId) {
       ...(waiting || []).map((d) => ({ donorId: d.id, alertType: "waiting" })),
     ];
 
-    const res = await apiFetch(`${API_BASE}/api/requests/${encodeURIComponent(reqId)}/alerts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        donors: donorPayloadItems,
-        remainingUnitsAtDonorAlert: remaining,
-      }),
-    });
+    const res = await apiFetch(
+      `${API_BASE}/api/requests/${encodeURIComponent(reqId)}/alerts`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          donors: donorPayloadItems,
+          remainingUnitsAtDonorAlert: remaining,
+        }),
+      },
+    );
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
@@ -3427,7 +3486,10 @@ async function alertDonorsForRequest(reqId) {
     req.remainingUnitsAtDonorAlert = remaining;
 
     if (alertCount > 0) {
-      toast(`🩸 Alerted ${alertCount} donor(s) for remaining ${remaining} unit(s)!`, "ok");
+      toast(
+        `🩸 Alerted ${alertCount} donor(s) for remaining ${remaining} unit(s)!`,
+        "ok",
+      );
     } else {
       toast("No new eligible donors to alert within current radius.", "info");
     }
@@ -3508,7 +3570,11 @@ function renderMatchedBankCard(mb, reqId, isFulfilled, isExpired) {
   const badgeLabel = isSufficient
     ? "🟢 Sufficient Stock"
     : `🟡 ${mb.availableUnitsAtMatch}/${mb.availableUnitsAtMatch} Partial Stock`;
-  const locStr = bb.city ? (bb.state ? `${esc(bb.city)}, ${esc(bb.state)}` : esc(bb.city)) : "";
+  const locStr = bb.city
+    ? bb.state
+      ? `${esc(bb.city)}, ${esc(bb.state)}`
+      : esc(bb.city)
+    : "";
   const resp = mb.responseStatus || "pending";
   const isAccepted = resp === "accepted";
   const isConfirmed = resp === "confirmed";
@@ -3516,7 +3582,7 @@ function renderMatchedBankCard(mb, reqId, isFulfilled, isExpired) {
   const respBadge = isConfirmed
     ? `<span class="badge green">✅ Confirmed (${mb.unitsSecured || mb.availableUnitsAtMatch} units)</span>`
     : isAccepted
-      ? `<span class="badge amber">🟡 Accepted (${mb.reservedUnits !== undefined ? mb.reservedUnits : (mb.unitsSecured || mb.availableUnitsAtMatch)} units reserved)</span>`
+      ? `<span class="badge amber">🟡 Accepted (${mb.reservedUnits !== undefined ? mb.reservedUnits : mb.unitsSecured || mb.availableUnitsAtMatch} units reserved)</span>`
       : isDeclined
         ? `<span class="badge grey">❌ Rejected</span>`
         : `<span class="badge blue">⏳ Pending Response</span>`;
@@ -3548,7 +3614,7 @@ function renderMatchedBankCard(mb, reqId, isFulfilled, isExpired) {
           ? `<span>🩸 <strong>Compatible stock:</strong> ${mb.availableUnitsAtMatch} unit(s) (${esc(
               Object.entries(mb.compatibleStock)
                 .map(([grp, qty]) => `${grp}: ${qty}`)
-                .join(", ")
+                .join(", "),
             )})</span>`
           : `<span>🩸 <strong>${esc(mb.bloodGroup)}</strong> — <strong>${mb.availableUnitsAtMatch}</strong> unit(s) available</span>`
       }
@@ -3859,7 +3925,9 @@ async function showReqDetail(id) {
     }
     return (
       `<div style="font-weight:700;font-size:14px;margin:16px 0 8px">🏦 Matching Blood Banks (${banks.length})</div>` +
-      banks.map((mb) => renderMatchedBankCard(mb, r.id, isFulfilled, isExpired)).join("")
+      banks
+        .map((mb) => renderMatchedBankCard(mb, r.id, isFulfilled, isExpired))
+        .join("")
     );
   };
 
@@ -3999,7 +4067,10 @@ function confirmBloodBankForRequest(reqId, bloodBankId) {
       });
     })
     .catch(() => {
-      toast("Failed to confirm blood bank. Please check backend connection.", "err");
+      toast(
+        "Failed to confirm blood bank. Please check backend connection.",
+        "err",
+      );
     });
 }
 
@@ -4037,21 +4108,21 @@ function rejectBloodBankForRequest(reqId, bloodBankId) {
       });
     })
     .catch(() => {
-      toast("Failed to reject blood bank. Please check backend connection.", "err");
+      toast(
+        "Failed to reject blood bank. Please check backend connection.",
+        "err",
+      );
     });
 }
 
 function fulfillReq(id) {
   if (!CU || CU.role !== "hospital") return;
 
-  apiFetch(
-    `${API_BASE}/api/requests/${encodeURIComponent(id)}/fulfill`,
-    {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ hospitalId: CU.id }),
-    },
-  )
+  apiFetch(`${API_BASE}/api/requests/${encodeURIComponent(id)}/fulfill`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ hospitalId: CU.id }),
+  })
     .then(async (res) => {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -4320,7 +4391,10 @@ function renderBDash() {
     const stock = inv.stock || emptyBloodStock();
     const lastUpdated = inv.lastUpdated || emptyLastUpdated();
 
-    const reservedByGroup = { ...emptyBloodStock(), ...(inv.reservedStock || {}) };
+    const reservedByGroup = {
+      ...emptyBloodStock(),
+      ...(inv.reservedStock || {}),
+    };
     if (!inv.reservedStock || Object.keys(inv.reservedStock).length === 0) {
       (allAlerts || []).forEach((a) => {
         if (a.bankStatus === "accepted") {
@@ -4412,7 +4486,9 @@ function renderBDash() {
     CU.lat != null && CU.lng != null
       ? `${Number(CU.lat).toFixed(4)}, ${Number(CU.lng).toFixed(4)}`
       : "Not captured";
-  const cityState = CU.city ? `${esc(CU.city)}${CU.state ? ', ' + esc(CU.state) : ''}` : "—";
+  const cityState = CU.city
+    ? `${esc(CU.city)}${CU.state ? ", " + esc(CU.state) : ""}`
+    : "—";
   $("b-dash-details").innerHTML = `
     <div class="frow">
       <div class="fg" style="margin-bottom:8px"><label class="lbl">Registration / License ID</label><div>${esc(CU.registrationNumber || "—")}</div></div>
@@ -4604,7 +4680,7 @@ function showBankReqDetail(id) {
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
           ${!isSched ? `<span class="badge urg-${esc(req.urgency)}">${esc(req.urgency)}</span>` : `<span class="badge blue">📅 Scheduled</span>`}
           <span class="badge ${bm.status === "sufficient" ? "green" : "amber"}">${bm.status === "sufficient" ? "🟢 Sufficient" : "🟡 Partial Availability"}</span>
-          <span class="badge ${isConfirmed ? "green" : isAccepted ? "amber" : isDeclined ? "grey" : isFulfilled ? "green" : "blue"}">Response: ${isConfirmed ? `✅ Confirmed (${bm.unitsSecured || ""} units)` : isAccepted ? `🟡 Accepted (${bm.reservedUnits !== undefined ? bm.reservedUnits : (bm.unitsSecured || "")} units reserved)` : isDeclined ? "❌ Declined" : isFulfilled ? "✓ Fulfilled" : "⏳ Pending"}</span>
+          <span class="badge ${isConfirmed ? "green" : isAccepted ? "amber" : isDeclined ? "grey" : isFulfilled ? "green" : "blue"}">Response: ${isConfirmed ? `✅ Confirmed (${bm.unitsSecured || ""} units)` : isAccepted ? `🟡 Accepted (${bm.reservedUnits !== undefined ? bm.reservedUnits : bm.unitsSecured || ""} units reserved)` : isDeclined ? "❌ Declined" : isFulfilled ? "✓ Fulfilled" : "⏳ Pending"}</span>
         </div>
       </div>
     </div>
@@ -4626,7 +4702,7 @@ function showBankReqDetail(id) {
            <button class="btn danger flex-1" style="flex:1" onclick="respondBloodBankAlert('${req.id}','rejected');closeModal('modal-req')">❌ Decline Request</button>
          </div>`
         : isConfirmed || isAccepted || isDeclined
-          ? `<div style="text-align:center;padding:10px;background:var(--border-l);border-radius:10px;font-weight:700;color:var(--text-m)">Response recorded: ${isConfirmed ? `✅ Confirmed by Hospital (${bm.unitsSecured || ""} units)` : isAccepted ? `🟡 Accepted (${bm.reservedUnits !== undefined ? bm.reservedUnits : (bm.unitsSecured || "")} units reserved · Awaiting confirmation)` : "❌ Declined"} (${fmtDateTime(bm.respondedAt)})</div>`
+          ? `<div style="text-align:center;padding:10px;background:var(--border-l);border-radius:10px;font-weight:700;color:var(--text-m)">Response recorded: ${isConfirmed ? `✅ Confirmed by Hospital (${bm.unitsSecured || ""} units)` : isAccepted ? `🟡 Accepted (${bm.reservedUnits !== undefined ? bm.reservedUnits : bm.unitsSecured || ""} units reserved · Awaiting confirmation)` : "❌ Declined"} (${fmtDateTime(bm.respondedAt)})</div>`
           : `<div style="text-align:center;padding:10px;background:var(--border-l);border-radius:10px;font-weight:700;color:var(--text-m)">✓ Request Completed · This request has already been fulfilled by the hospital.</div>`
     }`;
   openModal("modal-req");

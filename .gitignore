@@ -1,0 +1,30 @@
+﻿# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+!.env.example
+
+# Build and Dependency Artifacts
+target/
+*.class
+node_modules/
+dist/
+build/
+
+# IDE / Editor Files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/

@@ -1,0 +1,2003 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>BloodLink — Smart Blood Donor Platform</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div id="toast-wrap"></div>
+    <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <!-- ═══ LANDING ═══ -->
+    <div id="scr-landing">
+      <nav class="l-nav">
+        <div class="logo"><span class="logo-dot"></span>BloodLink</div>
+        <div class="nav-right">
+          <button class="btn ghost sm" onclick="toggleTheme()">🌙</button>
+          <button class="btn ghost sm" onclick="openAuth('donor', 'login')">
+            Login
+          </button>
+          <button class="btn red sm" onclick="openAuth('donor', 'signup')">
+            Join as Donor
+          </button>
+          <button class="btn blue sm" onclick="openAuth('hospital', 'signup')">
+            Hospital
+          </button>
+          <button
+            class="btn green sm"
+            onclick="openAuth('bloodbank', 'signup')"
+          >
+            Blood Bank
+          </button>
+        </div>
+      </nav>
+
+      <section class="hero">
+        <div class="hero-glow"></div>
+        <div class="hero-badge">
+          <span class="pulse-dot"></span>🩸 Smart Blood Matching Platform
+        </div>
+        <h1>
+          Save Lives With<br />the Right <span class="hl">Blood Match</span>
+        </h1>
+        <p>
+          BloodLink connects blood donors with hospitals in real-time using
+          geo-based smart matching. Every second counts — be the reason someone
+          survives.
+        </p>
+        <div class="role-cards">
+          <div class="role-card donor" onclick="openAuth('donor', 'signup')">
+            <div class="rc-icon donor-icon">🩸</div>
+            <h3>I'm a Donor</h3>
+            <p>
+              Register and get matched with hospitals near you when they need
+              your blood type.
+            </p>
+            <span class="rc-cta red">Register as Donor →</span>
+          </div>
+          <div
+            class="role-card hospital"
+            onclick="openAuth('hospital', 'signup')"
+          >
+            <div class="rc-icon hospital-icon">🏥</div>
+            <h3>I'm a Hospital</h3>
+            <p>
+              Find and contact matching blood donors within minutes during
+              emergencies.
+            </p>
+            <span class="rc-cta blue">Register Hospital →</span>
+          </div>
+          <div
+            class="role-card bloodbank"
+            onclick="openAuth('bloodbank', 'signup')"
+          >
+            <div class="rc-icon bloodbank-icon">🏦</div>
+            <h3>I'm a Blood Bank</h3>
+            <p>Register your blood bank to manage inventory by blood group.</p>
+            <span class="rc-cta green">Register Blood Bank →</span>
+          </div>
+        </div>
+        <div class="l-stats">
+          <div class="lst">
+            <div class="lst-n" id="l-stat-donors">0</div>
+            <div class="lst-l">Registered Donors</div>
+          </div>
+          <div class="lst">
+            <div class="lst-n" id="l-stat-hospitals">0</div>
+            <div class="lst-l">Partner Hospitals</div>
+          </div>
+          <div class="lst">
+            <div class="lst-n" id="l-stat-bloodbanks">0</div>
+            <div class="lst-l">Blood Banks</div>
+          </div>
+          <div class="lst">
+            <div class="lst-n" id="l-stat-requests">0</div>
+            <div class="lst-l">Blood Requests</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="ticker">
+        <div class="ticker-inner" id="ticker-inner"></div>
+      </div>
+
+      <div class="l-section">
+        <div class="section-title">Why Choose BloodLink?</div>
+        <div class="section-sub">
+          Built for speed, precision, and lives saved
+        </div>
+        <div class="features-grid">
+          <div class="feat">
+            <div class="feat-icon">📍</div>
+            <strong>Geo-Based Matching</strong>
+            <p>
+              Smart radius matching — you choose 2km to 50km. Auto-expands if
+              needed.
+            </p>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">⚡</div>
+            <strong>Smart Priority</strong>
+            <p>
+              Top 3 closest donors contacted directly, next 7 on standby waiting
+              list.
+            </p>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">🔒</div>
+            <strong>Privacy First</strong>
+            <p>
+              Donor details only visible to verified hospitals. Never shared
+              publicly.
+            </p>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">📱</div>
+            <strong>Instant Alerts</strong>
+            <p>Real-time in-app notifications. Accept or decline in one tap.</p>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">🩺</div>
+            <strong>Blood Reports</strong>
+            <p>
+              Upload your test reports. Hospitals can view them for faster
+              decisions.
+            </p>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">📊</div>
+            <strong>Donation Tracking</strong>
+            <p>
+              Log every donation, track history, and auto-check eligibility.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="l-section" style="padding-top: 0">
+        <div class="section-title">Stories That Matter</div>
+        <div class="section-sub">Real experiences from our community</div>
+        <div id="reviews-container">
+          <div class="testi-grid" id="testi-grid"></div>
+        </div>
+        <div style="text-align: center; margin-top: 24px">
+          <button class="btn red sm" onclick="openReviewModal()">
+            ⭐ Share Your Experience
+          </button>
+        </div>
+      </div>
+
+      <footer class="l-footer">
+        Made for saving lives &nbsp;·&nbsp; BloodLink © 2026 &nbsp;·&nbsp;
+        <a onclick="openAuth('donor', 'signup')">Join as Donor</a> &nbsp;·&nbsp;
+        <a onclick="openAuth('hospital', 'signup')">Register Hospital</a>
+        &nbsp;·&nbsp;
+        <a onclick="openAuth('bloodbank', 'signup')">Register Blood Bank</a>
+      </footer>
+    </div>
+
+    <!-- ═══ AUTH ═══ -->
+    <div id="scr-auth" style="display: none">
+      <div class="auth-wrap">
+        <div class="auth-panel" id="auth-panel">
+          <div class="ap-logo">🩸 BloodLink</div>
+          <div>
+            <div class="ap-quote" id="ap-quote">
+              "Every drop counts. Every donor is a hero."
+            </div>
+            <div class="ap-sub" id="ap-sub">
+              Join thousands saving lives through smart geo-based blood
+              matching.
+            </div>
+            <div class="ap-bgs">
+              <span>A+</span><span>B+</span><span>O-</span><span>AB+</span
+              ><span>O+</span><span>B-</span>
+            </div>
+          </div>
+        </div>
+        <div class="auth-form-side" id="auth-form-area">
+          <button class="auth-back" onclick="backToLanding()">
+            ← Back to home
+          </button>
+          <div class="auth-tabs" id="auth-tabs">
+            <div
+              class="atab active"
+              id="atab-login"
+              onclick="switchAuthTab('login')"
+            >
+              Sign In
+            </div>
+            <div
+              class="atab"
+              id="atab-signup"
+              onclick="switchAuthTab('signup')"
+            >
+              Sign Up
+            </div>
+          </div>
+
+          <!-- LOGIN -->
+          <div id="auth-login-form">
+            <div class="auth-title" id="auth-login-title">Welcome back!</div>
+            <div class="auth-sub-text" id="auth-login-sub">
+              Login to your account
+            </div>
+            <div class="fg">
+              <label class="lbl">Email</label
+              ><input
+                type="email"
+                id="l-email"
+                class="inp"
+                placeholder="your@email.com"
+              /><span id="l-email-e" class="ferr"></span>
+            </div>
+            <div class="fg">
+              <label class="lbl">Password</label
+              ><input
+                type="password"
+                id="l-pass"
+                class="inp"
+                placeholder="Enter password"
+              /><span id="l-pass-e" class="ferr"></span>
+            </div>
+            <button class="btn red block lg" onclick="doLogin()">
+              Sign In →
+            </button>
+            <div class="auth-switch">
+              No account? <a onclick="switchAuthTab('signup')">Sign up free</a>
+            </div>
+          </div>
+
+          <!-- SIGNUP DONOR -->
+          <div id="auth-signup-donor" style="display: none">
+            <div class="auth-title">Create Donor Account</div>
+            <div class="auth-sub-text">Register to start saving lives 🩸</div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Full Name *</label
+                ><input
+                  type="text"
+                  id="sd-name"
+                  class="inp"
+                  placeholder="Your full name"
+                /><span id="sd-name-e" class="ferr"></span>
+              </div>
+              <div class="fg">
+                <label class="lbl">Age *</label
+                ><input
+                  type="number"
+                  id="sd-age"
+                  class="inp"
+                  placeholder="18–65"
+                  min="18"
+                  max="65"
+                /><span id="sd-age-e" class="ferr"></span>
+              </div>
+            </div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Email *</label
+                ><input
+                  type="email"
+                  id="sd-email"
+                  class="inp"
+                  placeholder="your@email.com"
+                /><span id="sd-email-e" class="ferr"></span>
+              </div>
+              <div class="fg">
+                <label class="lbl">Phone *</label
+                ><input
+                  type="tel"
+                  id="sd-phone"
+                  class="inp"
+                  placeholder="10-digit number"
+                /><span id="sd-phone-e" class="ferr"></span>
+              </div>
+            </div>
+            <div class="fg">
+              <label class="lbl">Blood Group *</label
+              ><select id="sd-bg" class="inp">
+                <option value="">Select Blood Group</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>O+</option>
+                <option>O-</option>
+                <option>AB+</option>
+                <option>AB-</option></select
+              ><span id="sd-bg-e" class="ferr"></span>
+            </div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">City *</label
+                ><input
+                  type="text"
+                  id="sd-city"
+                  class="inp"
+                  placeholder="Your city"
+                /><span id="sd-city-e" class="ferr"></span>
+              </div>
+              <div class="fg">
+                <label class="lbl">State</label
+                ><input
+                  type="text"
+                  id="sd-state"
+                  class="inp"
+                  placeholder="State"
+                />
+              </div>
+            </div>
+            <div class="loc-detect-box" id="sd-loc-box">
+              <span class="loc-icon">📍</span>
+              <div class="loc-text">
+                <strong>Auto-detect location</strong
+                ><span id="sd-loc-status">Detect real GPS coordinates</span>
+              </div>
+              <button class="btn red sm" onclick="detectLoc('sd')">
+                Detect
+              </button>
+            </div>
+            <input type="hidden" id="sd-lat" /><input
+              type="hidden"
+              id="sd-lng"
+            />
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Password *</label
+                ><input
+                  type="password"
+                  id="sd-pass"
+                  class="inp"
+                  placeholder="Min 8 characters"
+                /><span id="sd-pass-e" class="ferr"></span>
+              </div>
+              <div class="fg">
+                <label class="lbl">Confirm Password *</label
+                ><input
+                  type="password"
+                  id="sd-pass2"
+                  class="inp"
+                  placeholder="Confirm password"
+                /><span id="sd-pass2-e" class="ferr"></span>
+              </div>
+            </div>
+            <div class="fg">
+              <label class="lbl"
+                >Blood Report
+                <small style="text-transform: none; letter-spacing: 0"
+                  >(Optional)</small
+                ></label
+              >
+              <div
+                class="drop-zone"
+                id="sd-drop"
+                onclick="document.getElementById('sd-file').click()"
+              >
+                <div>📄</div>
+                <b>Upload blood report</b><small>PDF or Image · Max 5MB</small>
+              </div>
+              <input
+                type="file"
+                id="sd-file"
+                accept=".pdf,image/*"
+                style="display: none"
+                onchange="handleFile(this, 'sd')"
+              />
+            </div>
+            <button class="btn red block lg" onclick="doSignup('donor')">
+              Create Account →
+            </button>
+            <div class="auth-switch">
+              Already have an account?
+              <a onclick="switchAuthTab('login')">Sign in</a>
+            </div>
+          </div>
+
+          <!-- SIGNUP HOSPITAL -->
+          <div id="auth-signup-hospital" style="display: none">
+            <div class="auth-title">Hospital Registration</div>
+            <div class="auth-sub-text">Register your hospital 🏥</div>
+            <div class="fg">
+              <label class="lbl">Hospital Name *</label
+              ><input
+                type="text"
+                id="sh-name"
+                class="inp"
+                placeholder="Full hospital name"
+              /><span id="sh-name-e" class="ferr"></span>
+            </div>
+            <div class="fg">
+              <label class="lbl">Registration / License Number *</label
+              ><input
+                type="text"
+                id="sh-reg"
+                class="inp"
+                placeholder="License or registration number"
+              /><span id="sh-reg-e" class="ferr"></span>
+            </div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Phone *</label
+                ><input
+                  type="tel"
+                  id="sh-phone"
+                  class="inp"
+                  placeholder="Contact number"
+                /><span id="sh-phone-e" class="ferr"></span>
+              </div>
+              <div class="fg">
+                <label class="lbl">Email *</label
+                ><input
+                  type="email"
+                  id="sh-email"
+                  class="inp"
+                  placeholder="hospital@email.com"
+                /><span id="sh-email-e" class="ferr"></span>
+              </div>
+            </div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">City *</label
+                ><input
+                  type="text"
+                  id="sh-city"
+                  class="inp"
+                  placeholder="City"
+                /><span id="sh-city-e" class="ferr"></span>
+              </div>
+              <div class="fg">
+                <label class="lbl">State</label
+                ><input
+                  type="text"
+                  id="sh-state"
+                  class="inp"
+                  placeholder="State"
+                />
+              </div>
+            </div>
+            <div class="loc-detect-box blue" id="sh-loc-box">
+              <span class="loc-icon">📍</span>
+              <div class="loc-text">
+                <strong>Auto-detect hospital location</strong
+                ><span id="sh-loc-status">Detect real GPS coordinates</span>
+              </div>
+              <button class="btn blue sm" onclick="detectLoc('sh')">
+                Detect
+              </button>
+            </div>
+            <input type="hidden" id="sh-lat" /><input
+              type="hidden"
+              id="sh-lng"
+            />
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Password *</label
+                ><input
+                  type="password"
+                  id="sh-pass"
+                  class="inp"
+                  placeholder="Min 8 characters"
+                /><span id="sh-pass-e" class="ferr"></span>
+              </div>
+              <div class="fg">
+                <label class="lbl">Confirm Password *</label
+                ><input
+                  type="password"
+                  id="sh-pass2"
+                  class="inp"
+                  placeholder="Confirm password"
+                /><span id="sh-pass2-e" class="ferr"></span>
+              </div>
+            </div>
+            <button class="btn blue block lg" onclick="doSignup('hospital')">
+              Register Hospital →
+            </button>
+            <div class="auth-switch">
+              Already registered?
+              <a onclick="switchAuthTab('login')">Sign in</a>
+            </div>
+          </div>
+
+          <!-- SIGNUP BLOOD BANK -->
+          <div id="auth-signup-bloodbank" style="display: none">
+            <div class="auth-title">Blood Bank Registration</div>
+            <div class="auth-sub-text">Register your blood bank 🏦</div>
+            <div class="fg">
+              <label class="lbl">Blood Bank Name *</label
+              ><input
+                type="text"
+                id="bb-name"
+                class="inp"
+                placeholder="Full blood bank name"
+              /><span id="bb-name-e" class="ferr"></span>
+            </div>
+            <div class="fg">
+              <label class="lbl">Registration / License Number *</label
+              ><input
+                type="text"
+                id="bb-reg"
+                class="inp"
+                placeholder="License or registration number"
+              /><span id="bb-reg-e" class="ferr"></span>
+            </div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Phone *</label
+                ><input
+                  type="tel"
+                  id="bb-phone"
+                  class="inp"
+                  placeholder="Contact number"
+                /><span id="bb-phone-e" class="ferr"></span>
+              </div>
+              <div class="fg">
+                <label class="lbl">Email *</label
+                ><input
+                  type="email"
+                  id="bb-email"
+                  class="inp"
+                  placeholder="bloodbank@email.com"
+                /><span id="bb-email-e" class="ferr"></span>
+              </div>
+            </div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">City *</label
+                ><input
+                  type="text"
+                  id="bb-city"
+                  class="inp"
+                  placeholder="City"
+                /><span id="bb-city-e" class="ferr"></span>
+              </div>
+              <div class="fg">
+                <label class="lbl">State</label
+                ><input
+                  type="text"
+                  id="bb-state"
+                  class="inp"
+                  placeholder="State"
+                />
+              </div>
+            </div>
+            <div class="loc-detect-box green" id="bb-loc-box">
+              <span class="loc-icon">📍</span>
+              <div class="loc-text">
+                <strong>Auto-detect blood bank location</strong
+                ><span id="bb-loc-status">Detect real GPS coordinates</span>
+              </div>
+              <button class="btn green sm" onclick="detectLoc('bb')">
+                Detect
+              </button>
+            </div>
+            <input type="hidden" id="bb-lat" /><input
+              type="hidden"
+              id="bb-lng"
+            />
+            <div class="fg">
+              <label class="lbl">Operating Hours *</label
+              ><input
+                type="text"
+                id="bb-hours"
+                class="inp"
+                placeholder="e.g. Mon–Sat 9:00 AM – 6:00 PM"
+              /><span id="bb-hours-e" class="ferr"></span>
+            </div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Password *</label
+                ><input
+                  type="password"
+                  id="bb-pass"
+                  class="inp"
+                  placeholder="Min 8 characters"
+                /><span id="bb-pass-e" class="ferr"></span>
+              </div>
+              <div class="fg">
+                <label class="lbl">Confirm Password *</label
+                ><input
+                  type="password"
+                  id="bb-pass2"
+                  class="inp"
+                  placeholder="Confirm password"
+                /><span id="bb-pass2-e" class="ferr"></span>
+              </div>
+            </div>
+            <button class="btn green block lg" onclick="doSignup('bloodbank')">
+              Register Blood Bank →
+            </button>
+            <div class="auth-switch">
+              Already registered?
+              <a onclick="switchAuthTab('login')">Sign in</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ APP ═══ -->
+    <div id="scr-app">
+      <aside id="sidebar">
+        <div class="sb-head">
+          <div class="sb-logo"><span class="logo-dot sm"></span>BloodLink</div>
+          <div id="sb-role-tag" class="sb-tag donor">Donor</div>
+        </div>
+        <nav id="sb-nav"></nav>
+        <div class="sb-foot">
+          <div class="sb-user" onclick="goProfile()">
+            <div class="av sm" id="sb-av">?</div>
+            <div>
+              <div id="sb-name" class="sb-uname">—</div>
+              <div id="sb-email" class="sb-uemail">—</div>
+            </div>
+          </div>
+          <div class="sb-acts">
+            <button
+              class="btn ghost sm icon"
+              onclick="toggleTheme()"
+              title="Toggle theme"
+            >
+              🌙
+            </button>
+            <button class="btn ghost sm" style="flex: 1" onclick="doLogout()">
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <div id="main">
+        <header id="topbar">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <button class="btn ghost icon mob-only" onclick="toggleSidebar()">
+              ☰
+            </button>
+            <h2 id="topbar-title">Dashboard</h2>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px">
+            <div
+              class="notif-wrap"
+              id="notif-wrap"
+              onclick="goAlerts()"
+              style="display: none"
+            >
+              <button class="btn ghost icon">🔔</button>
+              <span
+                class="notif-dot"
+                id="notif-dot"
+                style="display: none"
+              ></span>
+            </div>
+            <div id="role-chip" class="badge red">Donor</div>
+          </div>
+        </header>
+
+        <!-- DONOR PAGES -->
+        <div id="page-d-dashboard" class="page">
+          <div class="hero-banner donor-banner">
+            <div>
+              <div class="banner-label">Donor Dashboard</div>
+              <div id="d-wname" class="banner-name"></div>
+              <div
+                style="
+                  display: flex;
+                  gap: 10px;
+                  align-items: center;
+                  margin-top: 8px;
+                  flex-wrap: wrap;
+                "
+              >
+                <div id="d-wbg" class="bgb md"></div>
+                <div id="d-wloc" style="font-size: 13px; opacity: 0.85"></div>
+                <button
+                  class="btn green sm"
+                  style="margin-left: 4px"
+                  onclick="updateCurrentLocationManually()"
+                >
+                  📍 Update Location
+                </button>
+              </div>
+            </div>
+            <div id="d-avail-toggle" class="avail-btn" onclick="toggleAvail()">
+              <div id="d-tgl-sw" class="tgl-sw"></div>
+              <span id="d-tgl-lbl">❌ Not Available</span>
+            </div>
+          </div>
+          <div id="d-loc-banner"></div>
+          <div class="stats-grid" id="d-stats"></div>
+          <div class="qa-grid" id="d-qa"></div>
+          <div class="card">
+            <div class="ctitle">⚡ Eligibility Status</div>
+            <div id="d-elig"></div>
+          </div>
+          <div class="card">
+            <div class="ctitle">🔔 Pending Alerts</div>
+            <div id="d-pending"></div>
+          </div>
+          <div class="card">
+            <div class="ctitle">📊 Recent Activity</div>
+            <div id="d-activity" class="activity-list"></div>
+          </div>
+        </div>
+
+        <div id="page-d-alerts" class="page">
+          <div class="sec-hdr">
+            <div class="sec-title">
+              🔔 My Alerts
+              <span
+                id="d-alert-cnt"
+                class="badge red"
+                style="display: none"
+              ></span>
+            </div>
+            <div class="sec-sub">
+              Blood requests from hospitals that need your help
+            </div>
+          </div>
+          <div class="tabs">
+            <button
+              class="tbtn active"
+              onclick="switchTab('d-alerts', 'pending', this, 'd')"
+            >
+              ⏳ Pending</button
+            ><button
+              class="tbtn"
+              onclick="switchTab('d-alerts', 'accepted', this, 'd')"
+            >
+              ✅ Accepted</button
+            ><button
+              class="tbtn"
+              onclick="switchTab('d-alerts', 'rejected', this, 'd')"
+            >
+              ❌ Declined</button
+            ><button
+              class="tbtn"
+              onclick="switchTab('d-alerts', 'all', this, 'd')"
+            >
+              📋 All
+            </button>
+          </div>
+          <div id="d-alerts-pending" class="tc active"></div>
+          <div id="d-alerts-accepted" class="tc"></div>
+          <div id="d-alerts-rejected" class="tc"></div>
+          <div id="d-alerts-all" class="tc"></div>
+        </div>
+
+        <div id="page-d-history" class="page">
+          <div class="sec-hdr">
+            <div class="sec-title">📅 Donation History</div>
+            <div class="sec-sub">Your personal donation log</div>
+          </div>
+          <div class="stats-grid" id="d-hist-stats"></div>
+          <div style="margin-bottom: 16px">
+            <button class="btn red" onclick="openModal('modal-log')">
+              + Log Donation
+            </button>
+          </div>
+          <div class="card" id="d-hist-table"></div>
+        </div>
+
+        <div id="page-d-tools" class="page">
+          <div class="sec-hdr">
+            <div class="sec-title">🧪 Donor Tools</div>
+          </div>
+          <div class="tabs">
+            <button
+              class="tbtn active"
+              onclick="switchTab('d-tools', 'elig', this, 'd')"
+            >
+              Eligibility</button
+            ><button
+              class="tbtn"
+              onclick="
+                switchTab('d-tools', 'compat', this, 'd');
+                renderCompat('d');
+              "
+            >
+              Compatibility</button
+            ><button
+              class="tbtn"
+              onclick="
+                switchTab('d-tools', 'idcard', this, 'd');
+                renderIdCard();
+              "
+            >
+              Donor ID</button
+            ><button
+              class="tbtn"
+              onclick="
+                switchTab('d-tools', 'guide', this, 'd');
+                renderDonorGuide();
+              "
+            >
+              Guide
+            </button>
+          </div>
+          <div id="d-tools-elig" class="tc active">
+            <div class="card">
+              <div class="ctitle">🩸 Eligibility Checker</div>
+              <p
+                style="
+                  color: var(--text-m);
+                  margin-bottom: 16px;
+                  font-size: 13.5px;
+                "
+              >
+                Whole blood requires a 90-day gap between donations.
+              </p>
+              <div class="fg">
+                <label class="lbl">Last Donation Date</label
+                ><input
+                  type="date"
+                  id="elig-inp"
+                  class="inp"
+                  style="max-width: 260px"
+                />
+              </div>
+              <button class="btn red" onclick="checkElig()">Check</button>
+              <div id="elig-res" class="elig-res"></div>
+            </div>
+          </div>
+          <div id="d-tools-compat" class="tc">
+            <div class="card">
+              <div class="ctitle">🔄 Blood Compatibility Chart</div>
+              <p
+                style="
+                  font-size: 13px;
+                  color: var(--text-m);
+                  margin-bottom: 14px;
+                "
+              >
+                Rows = Donor · Columns = Recipient · ✅ = Compatible
+              </p>
+              <div class="tbl-wrap">
+                <div id="compat-d"></div>
+              </div>
+            </div>
+          </div>
+          <div id="d-tools-idcard" class="tc">
+            <div class="card">
+              <div class="ctitle">🪪 Donor ID Card</div>
+              <div id="id-card-preview"></div>
+              <button
+                class="btn ghost sm"
+                style="margin-top: 14px"
+                onclick="window.print()"
+              >
+                🖨️ Print
+              </button>
+            </div>
+          </div>
+          <div id="d-tools-guide" class="tc">
+            <div id="donor-guide"></div>
+          </div>
+        </div>
+
+        <div id="page-d-reviews" class="page">
+          <div id="d-reviews-content"></div>
+        </div>
+
+        <div id="page-d-faq" class="page">
+          <div class="sec-hdr">
+            <div class="sec-title">❓ FAQ</div>
+          </div>
+          <div id="faq-d"></div>
+        </div>
+
+        <div id="page-d-profile" class="page">
+          <div class="sec-hdr">
+            <div class="sec-title">👤 My Profile</div>
+          </div>
+          <div class="profile-head">
+            <div class="av xl" id="dp-av">?</div>
+            <div>
+              <div class="profile-name" id="dp-name-d">—</div>
+              <div class="profile-email" id="dp-email-d">—</div>
+              <div
+                style="
+                  display: flex;
+                  gap: 8px;
+                  flex-wrap: wrap;
+                  margin-top: 8px;
+                "
+              >
+                <div id="dp-bgb" class="bgb sm"></div>
+                <span id="dp-status" class="badge"></span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ctitle">Edit Personal Details</div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Full Name</label
+                ><input type="text" id="dp-name" class="inp" />
+              </div>
+              <div class="fg">
+                <label class="lbl">Phone</label
+                ><input type="tel" id="dp-phone" class="inp" />
+              </div>
+            </div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Blood Group</label
+                ><select id="dp-bg" class="inp">
+                  <option value="">Select</option>
+                  <option>A+</option>
+                  <option>A-</option>
+                  <option>B+</option>
+                  <option>B-</option>
+                  <option>O+</option>
+                  <option>O-</option>
+                  <option>AB+</option>
+                  <option>AB-</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label class="lbl">Age</label
+                ><input
+                  type="number"
+                  id="dp-age"
+                  class="inp"
+                  min="18"
+                  max="65"
+                />
+              </div>
+            </div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">City</label
+                ><input type="text" id="dp-city" class="inp" />
+              </div>
+              <div class="fg">
+                <label class="lbl">State</label
+                ><input type="text" id="dp-state" class="inp" />
+              </div>
+            </div>
+            <div class="loc-box">
+              <div class="loc-box-title">
+                📍 GPS Coordinates
+                <span id="dp-loc-badge" class="badge grey">Not set</span>
+              </div>
+              <div class="frow">
+                <div class="fg" style="margin-bottom: 8px">
+                  <label class="lbl">Latitude</label
+                  ><input
+                    type="number"
+                    id="dp-lat"
+                    class="inp"
+                    step="any"
+                    placeholder="e.g. 28.6139"
+                    oninput="updateLocBadge('dp')"
+                  />
+                </div>
+                <div class="fg" style="margin-bottom: 8px">
+                  <label class="lbl">Longitude</label
+                  ><input
+                    type="number"
+                    id="dp-lng"
+                    class="inp"
+                    step="any"
+                    placeholder="e.g. 77.2090"
+                    oninput="updateLocBadge('dp')"
+                  />
+                </div>
+              </div>
+              <button class="btn ghost sm" onclick="getGeo('dp')">
+                📍 Auto-detect My Location
+              </button>
+              <div class="fhint">
+                Location is used for hospital matching. Never shared publicly.
+              </div>
+            </div>
+            <div class="fg">
+              <label class="lbl">Last Donation Date</label
+              ><input
+                type="date"
+                id="dp-lastdon"
+                class="inp"
+                style="max-width: 240px"
+              />
+            </div>
+            <button class="btn red" onclick="saveDonorProfile()">
+              Save Changes ✓
+            </button>
+          </div>
+          <div class="card">
+            <div class="ctitle">🩺 Blood Report</div>
+            <div
+              id="dp-rep-info"
+              style="display: none; margin-bottom: 14px"
+            ></div>
+            <div
+              class="drop-zone"
+              id="dp-drop"
+              onclick="document.getElementById('dp-file').click()"
+            >
+              <div>📄</div>
+              <b>Click to upload blood report</b
+              ><small>PDF or Image · Max 5MB</small>
+            </div>
+            <input
+              type="file"
+              id="dp-file"
+              accept=".pdf,image/*"
+              style="display: none"
+              onchange="handleReport(this)"
+            />
+            <div
+              style="
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                margin-top: 14px;
+              "
+            >
+              <button class="btn red sm" onclick="saveReport()">
+                💾 Save Report
+              </button>
+              <button
+                class="btn ghost sm"
+                id="dp-preview-btn"
+                style="display: none"
+                onclick="previewReport()"
+              >
+                👁 Preview
+              </button>
+              <button
+                class="btn ghost sm"
+                id="dp-remove-btn"
+                style="display: none"
+                onclick="removeReport()"
+              >
+                🗑 Remove
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- HOSPITAL PAGES -->
+        <div id="page-h-dashboard" class="page">
+          <div class="hero-banner hospital-banner">
+            <div>
+              <div class="banner-label">Hospital Dashboard</div>
+              <div id="h-wname" class="banner-name"></div>
+              <div
+                id="h-wloc"
+                style="font-size: 13px; opacity: 0.8; margin-top: 6px"
+              ></div>
+            </div>
+            <button
+              class="btn sm"
+              style="
+                background: rgba(255, 255, 255, 0.2);
+                color: #fff;
+                border: 1.5px solid rgba(255, 255, 255, 0.3);
+              "
+              onclick="showPage('h-request')"
+            >
+              🆘 New Request
+            </button>
+          </div>
+          <div class="stats-grid" id="h-stats"></div>
+          <div class="qa-grid" id="h-qa"></div>
+          <div class="card">
+            <div class="ctitle">🩸 Donor Pool by Blood Group</div>
+            <div id="h-blood-inv" class="blood-inv"></div>
+          </div>
+          <div class="card">
+            <div class="ctitle">📋 Recent Requests</div>
+            <div id="h-recent-req"></div>
+          </div>
+          <div class="card">
+            <div class="ctitle">📊 Activity Feed</div>
+            <div id="h-activity" class="activity-list"></div>
+          </div>
+        </div>
+
+        <div id="page-h-donors" class="page">
+          <div class="sec-hdr">
+            <div class="sec-title">🔍 Find Blood Donors</div>
+            <div class="sec-sub">
+              Search by blood group, location, and radius
+            </div>
+          </div>
+          <div class="card filter-card">
+            <div class="filter-label">🩸 Blood Group</div>
+            <div id="hfd-bg-grid" class="bg-filter-grid"></div>
+            <div class="filter-label" style="margin-top: 14px">
+              📍 Search Radius
+            </div>
+            <div id="hfd-radius" class="radius-sel"></div>
+            <div class="frow" style="margin-top: 14px">
+              <div class="fg" style="margin-bottom: 0">
+                <label class="lbl">City</label
+                ><input
+                  type="text"
+                  id="hfd-city"
+                  class="inp hf"
+                  placeholder="Filter by city"
+                />
+              </div>
+              <div class="fg" style="margin-bottom: 0">
+                <label class="lbl">Availability</label
+                ><select id="hfd-avail" class="inp hf">
+                  <option value="">All</option>
+                  <option value="1">Available only</option>
+                </select>
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 10px;
+                margin-top: 14px;
+                align-items: center;
+                flex-wrap: wrap;
+              "
+            >
+              <button class="btn blue" onclick="searchDonors()">
+                🔍 Search
+              </button>
+              <button class="btn ghost sm" onclick="clearSearch()">
+                ✕ Clear
+              </button>
+              <span id="donor-count" class="sec-sub" style="margin: 0"></span>
+            </div>
+          </div>
+          <div id="hfd-results"></div>
+        </div>
+
+        <div id="page-h-request" class="page">
+          <div class="sec-hdr">
+            <div class="sec-title">🆘 Send Blood Request</div>
+            <div class="sec-sub">
+              Smart matching finds the closest compatible donors instantly
+            </div>
+          </div>
+          <div class="card">
+            <div class="ctitle">📋 Request Details</div>
+
+            <div class="fg" style="margin-bottom: 16px">
+              <label class="lbl">Request Type *</label>
+              <div style="display: flex; gap: 12px">
+                <button
+                  type="button"
+                  class="btn blue"
+                  id="btn-type-emergency"
+                  onclick="setReqType('EMERGENCY')"
+                  style="flex: 1"
+                >
+                  🆘 Emergency Request
+                </button>
+                <button
+                  type="button"
+                  class="btn ghost"
+                  id="btn-type-scheduled"
+                  onclick="setReqType('SCHEDULED')"
+                  style="flex: 1"
+                >
+                  📅 Scheduled Request
+                </button>
+              </div>
+              <input type="hidden" id="hr-type" value="EMERGENCY" />
+            </div>
+
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Patient Name *</label
+                ><input
+                  type="text"
+                  id="hr-patient"
+                  class="inp hf"
+                  placeholder="Patient full name"
+                /><span id="hr-patient-e" class="ferr"></span>
+              </div>
+              <div class="fg">
+                <label class="lbl">Blood Group *</label
+                ><select id="hr-bg" class="inp hf">
+                  <option value="">Select</option>
+                  <option>A+</option>
+                  <option>A-</option>
+                  <option>B+</option>
+                  <option>B-</option>
+                  <option>O+</option>
+                  <option>O-</option>
+                  <option>AB+</option>
+                  <option>AB-</option></select
+                ><span id="hr-bg-e" class="ferr"></span>
+              </div>
+            </div>
+
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Units Needed *</label
+                ><input
+                  type="number"
+                  id="hr-units"
+                  class="inp hf"
+                  placeholder="e.g. 2"
+                  min="1"
+                  max="20"
+                /><span id="hr-units-e" class="ferr"></span>
+              </div>
+              <div class="fg" id="hr-urgency-wrap">
+                <label class="lbl">Urgency *</label
+                ><select id="hr-urgency" class="inp hf">
+                  <option value="">Select</option>
+                  <option>Normal</option>
+                  <option>Urgent</option>
+                  <option>Critical</option></select
+                ><span id="hr-urgency-e" class="ferr"></span>
+              </div>
+            </div>
+
+            <div id="hr-scheduled-fields" style="display: none">
+              <div class="fg">
+                <label class="lbl">Reason / Clinical Cause *</label
+                ><input
+                  type="text"
+                  id="hr-reason"
+                  class="inp hf"
+                  placeholder="e.g. Planned Cardiac Bypass Surgery, Chemotherapy, etc."
+                /><span id="hr-reason-e" class="ferr"></span>
+              </div>
+              <div class="frow">
+                <div class="fg">
+                  <label class="lbl">Operation / Requirement Time *</label
+                  ><input
+                    type="datetime-local"
+                    id="hr-op-time"
+                    class="inp hf"
+                  /><span id="hr-op-time-e" class="ferr"></span>
+                </div>
+                <div class="fg">
+                  <label class="lbl">Accumulation Deadline *</label
+                  ><input
+                    type="datetime-local"
+                    id="hr-deadline"
+                    class="inp hf"
+                  /><span id="hr-deadline-e" class="ferr"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="fg">
+              <label class="lbl">Contact Number (from Profile) *</label>
+              <input
+                type="tel"
+                id="hr-contact"
+                class="inp hf"
+                placeholder="Hospital registered phone"
+                readonly
+                tabindex="-1"
+                style="
+                  background: var(--bg);
+                  cursor: not-allowed;
+                  font-weight: 600;
+                  opacity: 0.9;
+                "
+              />
+              <span
+                class="fhint"
+                style="
+                  font-size: 11.5px;
+                  color: var(--text-m);
+                  margin-top: 4px;
+                  display: block;
+                "
+              >
+                🔒 Auto-filled from your registered Hospital Profile. Update via
+                <a
+                  onclick="showPage('h-profile')"
+                  style="
+                    color: var(--sapphire);
+                    font-weight: 600;
+                    cursor: pointer;
+                    text-decoration: underline;
+                  "
+                  >Profile Settings</a
+                >.
+              </span>
+              <span id="hr-contact-e" class="ferr"></span>
+            </div>
+            <div class="fg">
+              <label class="lbl">Notes</label
+              ><textarea
+                id="hr-notes"
+                class="inp hf"
+                rows="2"
+                placeholder="Ward, special requirements (optional)"
+              ></textarea>
+            </div>
+            <div class="filter-label">📍 Search Radius</div>
+            <div id="hr-radius" class="radius-sel"></div>
+            <div id="hr-radius-hint" class="fhint" style="margin-bottom: 16px">
+              Will search donors within the selected radius
+            </div>
+            <button
+              class="btn blue lg"
+              id="send-req-btn"
+              onclick="sendRequest()"
+            >
+              🆘 Send Emergency Request
+            </button>
+          </div>
+        </div>
+
+        <div id="page-h-requests" class="page">
+          <div class="sec-hdr">
+            <div class="sec-title">📋 My Blood Requests</div>
+            <div class="sec-sub">Track all requests and donor responses</div>
+          </div>
+          <div style="margin-bottom: 16px">
+            <button class="btn blue sm" onclick="showPage('h-request')">
+              + New Request
+            </button>
+          </div>
+          <div class="tabs">
+            <button
+              class="tbtn active"
+              onclick="switchTab('h-requests', 'open', this, 'h')"
+            >
+              🔴 Open</button
+            ><button
+              class="tbtn"
+              onclick="switchTab('h-requests', 'fulfilled', this, 'h')"
+            >
+              ✅ Fulfilled</button
+            ><button
+              class="tbtn"
+              onclick="switchTab('h-requests', 'all', this, 'h')"
+            >
+              📋 All
+            </button>
+          </div>
+          <div id="h-requests-open" class="tc active"></div>
+          <div id="h-requests-fulfilled" class="tc"></div>
+          <div id="h-requests-all" class="tc"></div>
+        </div>
+
+        <div id="page-h-tools" class="page">
+          <div class="sec-hdr">
+            <div class="sec-title">🧪 Tools &amp; Reference</div>
+          </div>
+          <div class="tabs">
+            <button
+              class="tbtn active"
+              onclick="
+                switchTab('h-tools', 'compat', this, 'h');
+                renderCompat('h');
+              "
+            >
+              Compatibility</button
+            ><button
+              class="tbtn"
+              onclick="
+                switchTab('h-tools', 'guide', this, 'h');
+                renderHospGuide();
+              "
+            >
+              How It Works</button
+            ><button
+              class="tbtn"
+              onclick="
+                switchTab('h-tools', 'faq', this, 'h');
+                renderFAQ('h');
+              "
+            >
+              FAQ
+            </button>
+          </div>
+          <div id="h-tools-compat" class="tc active">
+            <div class="card">
+              <div class="ctitle">🔄 Blood Compatibility</div>
+              <div class="tbl-wrap">
+                <div id="compat-h"></div>
+              </div>
+            </div>
+          </div>
+          <div id="h-tools-guide" class="tc">
+            <div id="hosp-guide"></div>
+          </div>
+          <div id="h-tools-faq" class="tc">
+            <div id="faq-h"></div>
+          </div>
+        </div>
+
+        <div id="page-h-reviews" class="page">
+          <div id="h-reviews-content"></div>
+        </div>
+
+        <div id="page-h-profile" class="page">
+          <div class="sec-hdr">
+            <div class="sec-title">🏥 Hospital Profile</div>
+          </div>
+          <div class="profile-head">
+            <div class="av xl blue">🏥</div>
+            <div>
+              <div class="profile-name" id="hp-name-d">—</div>
+              <div class="profile-email" id="hp-email-d">—</div>
+              <div style="margin-top: 8px">
+                <span class="badge blue">🏥 Verified Hospital</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ctitle">Edit Details</div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Hospital Name</label
+                ><input type="text" id="hp-name" class="inp hf" />
+              </div>
+              <div class="fg">
+                <label class="lbl">Phone</label
+                ><input type="tel" id="hp-phone" class="inp hf" />
+              </div>
+            </div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">City</label
+                ><input type="text" id="hp-city" class="inp hf" />
+              </div>
+              <div class="fg">
+                <label class="lbl">State</label
+                ><input type="text" id="hp-state" class="inp hf" />
+              </div>
+            </div>
+            <div class="loc-box blue">
+              <div class="loc-box-title" style="color: var(--sapphire)">
+                📍 GPS Coordinates
+                <span id="hp-loc-badge" class="badge grey">Not set</span>
+              </div>
+              <div class="frow">
+                <div class="fg" style="margin-bottom: 8px">
+                  <label class="lbl">Latitude</label
+                  ><input
+                    type="number"
+                    id="hp-lat"
+                    class="inp hf"
+                    step="any"
+                    oninput="updateLocBadge('hp')"
+                  />
+                </div>
+                <div class="fg" style="margin-bottom: 8px">
+                  <label class="lbl">Longitude</label
+                  ><input
+                    type="number"
+                    id="hp-lng"
+                    class="inp hf"
+                    step="any"
+                    oninput="updateLocBadge('hp')"
+                  />
+                </div>
+              </div>
+              <button class="btn ghost sm" onclick="getGeo('hp')">
+                📍 Auto-detect Hospital Location
+              </button>
+              <div class="fhint">
+                Accurate coordinates enable precise donor matching.
+              </div>
+            </div>
+            <div class="fg">
+              <label class="lbl">Registration Number</label
+              ><input type="text" id="hp-reg" class="inp hf" />
+            </div>
+            <button class="btn blue" onclick="saveHospProfile()">
+              Save Changes ✓
+            </button>
+          </div>
+        </div>
+
+        <!-- BLOOD BANK PAGES -->
+        <div id="page-b-profile" class="page">
+          <div class="sec-hdr">
+            <div class="sec-title">🏦 Blood Bank Profile</div>
+          </div>
+          <div class="profile-head">
+            <div class="av xl green">🏦</div>
+            <div>
+              <div class="profile-name" id="bp-name-d">—</div>
+              <div class="profile-email" id="bp-email-d">—</div>
+              <div style="margin-top: 8px">
+                <span class="badge green">🏦 Verified Blood Bank</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ctitle">Edit Details</div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Blood Bank Name</label
+                ><input type="text" id="bp-name" class="inp" />
+              </div>
+              <div class="fg">
+                <label class="lbl">Phone</label
+                ><input type="tel" id="bp-phone" class="inp" />
+              </div>
+            </div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">City</label
+                ><input type="text" id="bp-city" class="inp" />
+              </div>
+              <div class="fg">
+                <label class="lbl">State</label
+                ><input type="text" id="bp-state" class="inp" />
+              </div>
+            </div>
+            <div class="loc-box green">
+              <div class="loc-box-title" style="color: var(--gr)">
+                📍 GPS Coordinates
+                <span id="bp-loc-badge" class="badge grey">Not set</span>
+              </div>
+              <div class="frow">
+                <div class="fg" style="margin-bottom: 8px">
+                  <label class="lbl">Latitude</label
+                  ><input
+                    type="number"
+                    id="bp-lat"
+                    class="inp"
+                    step="any"
+                    oninput="updateLocBadge('bp')"
+                  />
+                </div>
+                <div class="fg" style="margin-bottom: 8px">
+                  <label class="lbl">Longitude</label
+                  ><input
+                    type="number"
+                    id="bp-lng"
+                    class="inp"
+                    step="any"
+                    oninput="updateLocBadge('bp')"
+                  />
+                </div>
+              </div>
+              <button class="btn ghost sm" onclick="getGeo('bp')">
+                📍 Auto-detect Blood Bank Location
+              </button>
+              <div class="fhint">
+                Accurate coordinates enable precise hospital and donor matching.
+              </div>
+            </div>
+            <div class="frow">
+              <div class="fg">
+                <label class="lbl">Registration / License ID</label
+                ><input type="text" id="bp-reg" class="inp" />
+              </div>
+              <div class="fg">
+                <label class="lbl">Operating Hours</label
+                ><input type="text" id="bp-hours" class="inp" placeholder="e.g. 24 Hours, Mon–Sat 9 AM – 6 PM" />
+              </div>
+            </div>
+            <button class="btn green" onclick="saveBankProfile()">
+              Save Changes ✓
+            </button>
+          </div>
+        </div>
+
+        <div id="page-b-dashboard" class="page">
+          <div class="hero-banner bloodbank-banner">
+            <div>
+              <div class="banner-label">Blood Bank Dashboard</div>
+              <div id="b-wname" class="banner-name"></div>
+              <div
+                id="b-waddr"
+                style="font-size: 13px; opacity: 0.8; margin-top: 6px"
+              ></div>
+            </div>
+          </div>
+
+          <div class="stats-grid" id="b-stats"></div>
+
+          <div class="card">
+            <div
+              class="ctitle"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 10px;
+              "
+            >
+              <span>🩸 Blood Inventory Management</span>
+              <div style="display: flex; gap: 8px">
+                <button class="btn green sm" onclick="openAddStockModal()">
+                  + Add Stock
+                </button>
+                <button class="btn ghost sm" onclick="openUpdateStockModal()">
+                  ✏️ Update Stock
+                </button>
+              </div>
+            </div>
+            <div id="b-inventory-table"></div>
+          </div>
+
+          <div class="card">
+            <div
+              class="ctitle"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 10px;
+              "
+            >
+              <span>🏦 Blood Bank Details</span>
+              <button class="btn ghost sm" onclick="showPage('b-profile')">
+                ✏️ Edit Profile
+              </button>
+            </div>
+            <div id="b-dash-details"></div>
+          </div>
+        </div>
+
+        <div id="page-b-alerts" class="page">
+          <div class="sec-hdr">
+            <div class="sec-title">
+              🔔 Blood Requests
+              <span
+                id="b-alert-cnt"
+                class="badge green"
+                style="display: none"
+              ></span>
+            </div>
+            <div class="sec-sub">
+              Hospital blood requests matched with your inventory
+            </div>
+          </div>
+          <div class="tabs">
+            <button
+              class="tbtn active"
+              onclick="switchTab('b-alerts', 'pending', this, 'b')"
+            >
+              ⏳ Pending
+            </button>
+            <button
+              class="tbtn"
+              onclick="switchTab('b-alerts', 'accepted', this, 'b')"
+            >
+              ✅ Accepted
+            </button>
+            <button
+              class="tbtn"
+              onclick="switchTab('b-alerts', 'rejected', this, 'b')"
+            >
+              ❌ Declined
+            </button>
+            <button
+              class="tbtn"
+              onclick="switchTab('b-alerts', 'all', this, 'b')"
+            >
+              📋 All
+            </button>
+          </div>
+          <div id="b-alerts-pending" class="tc active"></div>
+          <div id="b-alerts-accepted" class="tc"></div>
+          <div id="b-alerts-rejected" class="tc"></div>
+          <div id="b-alerts-all" class="tc"></div>
+        </div>
+
+        <div id="page-b-reviews" class="page">
+          <div id="b-reviews-content"></div>
+        </div>
+      </div>
+      <!-- /main -->
+    </div>
+    <!-- /scr-app -->
+
+    <div id="bnav">
+      <div class="bni-wrap" id="bnav-items"></div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="modal-b-add-stock" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-title">
+          ➕ Add Blood Stock
+          <button class="mclose" onclick="closeModal('modal-b-add-stock')">
+            ×
+          </button>
+        </div>
+        <div class="fg">
+          <label class="lbl">Blood Group *</label>
+          <select id="b-add-bg" class="inp">
+            <option value="">Select Blood Group</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+          </select>
+          <span id="b-add-bg-e" class="ferr"></span>
+        </div>
+        <div class="fg">
+          <label class="lbl">Units to Add *</label>
+          <input
+            type="number"
+            id="b-add-units"
+            class="inp"
+            placeholder="e.g. 5"
+            min="1"
+            step="1"
+          />
+          <span id="b-add-units-e" class="ferr"></span>
+          <div class="fhint">
+            Enter a positive whole number. Units will be added to existing
+            stock.
+          </div>
+        </div>
+        <button class="btn green block lg" onclick="doAddStock()">
+          ➕ Add Stock
+        </button>
+      </div>
+    </div>
+
+    <div id="modal-b-update-stock" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-title">
+          ✏️ Update Blood Stock
+          <button class="mclose" onclick="closeModal('modal-b-update-stock')">
+            ×
+          </button>
+        </div>
+        <div class="fg">
+          <label class="lbl">Blood Group *</label>
+          <select id="b-up-bg" class="inp" onchange="onUpdateBgChange()">
+            <option value="">Select Blood Group</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+          </select>
+          <span id="b-up-bg-e" class="ferr"></span>
+        </div>
+        <div class="fg">
+          <label class="lbl">New Stock Quantity *</label>
+          <input
+            type="number"
+            id="b-up-units"
+            class="inp"
+            placeholder="e.g. 10"
+            min="0"
+            step="1"
+          />
+          <span id="b-up-units-e" class="ferr"></span>
+          <div class="fhint">
+            Enter a non-negative whole number (0 or greater). This sets the
+            total quantity for this group.
+          </div>
+        </div>
+        <button class="btn green block lg" onclick="doUpdateStock()">
+          💾 Update Stock
+        </button>
+      </div>
+    </div>
+
+    <div id="modal-b-remove-stock" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-title">
+          ⚠️ Confirm Stock Removal
+          <button class="mclose" onclick="closeModal('modal-b-remove-stock')">
+            ×
+          </button>
+        </div>
+        <p
+          id="b-remove-msg"
+          style="
+            margin-bottom: 20px;
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: var(--text-m);
+          "
+        ></p>
+        <div style="display: flex; gap: 12px">
+          <button
+            class="btn ghost"
+            style="flex: 1"
+            onclick="closeModal('modal-b-remove-stock')"
+          >
+            Cancel
+          </button>
+          <button class="btn danger" style="flex: 1" id="b-remove-confirm-btn">
+            Remove Stock
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="modal-log" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-title">
+          📅 Log a Donation
+          <button class="mclose" onclick="closeModal('modal-log')">×</button>
+        </div>
+        <div class="fg">
+          <label class="lbl">Date *</label
+          ><input type="date" id="ld-date" class="inp" /><span
+            id="ld-date-e"
+            class="ferr"
+          ></span>
+        </div>
+        <div class="frow">
+          <div class="fg">
+            <label class="lbl">Location / Hospital *</label
+            ><input
+              type="text"
+              id="ld-loc"
+              class="inp"
+              placeholder="Blood bank name"
+            /><span id="ld-loc-e" class="ferr"></span>
+          </div>
+          <div class="fg">
+            <label class="lbl">Units</label
+            ><input
+              type="number"
+              id="ld-units"
+              class="inp"
+              value="1"
+              min="1"
+              max="5"
+            />
+          </div>
+        </div>
+        <div class="fg">
+          <label class="lbl">Notes</label
+          ><input
+            type="text"
+            id="ld-notes"
+            class="inp"
+            placeholder="Optional"
+          />
+        </div>
+        <button class="btn red block" onclick="logDonation()">
+          💾 Save Donation
+        </button>
+      </div>
+    </div>
+    <div id="modal-donor" class="modal-overlay">
+      <div class="modal-box" style="max-width: 520px">
+        <div class="modal-title">
+          👤 Donor Profile
+          <button class="mclose" onclick="closeModal('modal-donor')">×</button>
+        </div>
+        <div id="donor-detail"></div>
+      </div>
+    </div>
+    <div id="modal-match" class="modal-overlay">
+      <div class="modal-box" style="max-width: 580px">
+        <div class="modal-title">
+          🎯 Match Results
+          <button class="mclose" onclick="closeModal('modal-match')">×</button>
+        </div>
+        <div id="match-content"></div>
+        <button
+          class="btn blue block"
+          style="margin-top: 16px"
+          onclick="
+            closeModal('modal-match');
+            showPage('h-requests');
+          "
+        >
+          View All Requests →
+        </button>
+      </div>
+    </div>
+    <div id="modal-req" class="modal-overlay">
+      <div class="modal-box" style="max-width: 600px">
+        <div class="modal-title">
+          📋 Request Details
+          <button class="mclose" onclick="closeModal('modal-req')">×</button>
+        </div>
+        <div id="req-detail"></div>
+      </div>
+    </div>
+    <div id="modal-report" class="modal-overlay">
+      <div class="modal-box" style="max-width: 680px">
+        <div class="modal-title">
+          🩺 Blood Report
+          <button class="mclose" onclick="closeModal('modal-report')">×</button>
+        </div>
+        <div id="report-content"></div>
+      </div>
+    </div>
+
+    <div id="modal-review" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-title">
+          <span id="rev-modal-title">⭐ Share Your Review</span>
+          <button class="mclose" onclick="closeModal('modal-review')">×</button>
+        </div>
+        <div class="fg">
+          <label class="lbl">Rating *</label>
+          <div
+            id="rev-rating-stars"
+            style="
+              display: flex;
+              gap: 8px;
+              font-size: 28px;
+              cursor: pointer;
+              color: #f59e0b;
+              margin: 6px 0;
+            "
+          >
+            <span onclick="setRevRating(1)">★</span>
+            <span onclick="setRevRating(2)">★</span>
+            <span onclick="setRevRating(3)">★</span>
+            <span onclick="setRevRating(4)">★</span>
+            <span onclick="setRevRating(5)">★</span>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="lbl">Your Experience / Feedback *</label>
+          <textarea
+            id="rev-text"
+            class="inp"
+            rows="4"
+            placeholder="Tell us how BloodLink helped you..."
+          ></textarea>
+          <span id="rev-text-e" class="ferr"></span>
+        </div>
+        <button
+          id="rev-submit-btn"
+          class="btn red block lg"
+          onclick="doSubmitReview()"
+        >
+          Submit Review ✓
+        </button>
+      </div>
+    </div>
+
+    <div id="modal-delete-review" class="modal-overlay">
+      <div class="modal-box" style="max-width: 420px; text-align: center">
+        <div style="font-size: 40px; margin-bottom: 12px">🗑️</div>
+        <div
+          class="modal-title"
+          style="justify-content: center; margin-bottom: 8px"
+        >
+          Delete Review?
+        </div>
+        <p style="color: var(--text-m); font-size: 14px; margin-bottom: 24px">
+          Are you sure you want to delete your review? This action cannot be
+          undone.
+        </p>
+        <div style="display: flex; gap: 10px; justify-content: center">
+          <button
+            class="btn ghost flex1"
+            onclick="closeModal('modal-delete-review')"
+          >
+            Cancel
+          </button>
+          <button class="btn red flex1" onclick="doDeleteReview()">
+            Delete Review
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
+<!--& "C:\Users\Raviteja\.vscode\extensions\oracle.oracle-java-26.0.2\nbcode\java\maven\bin\mvn.cmd" spring-boot:run-->
+<!--& "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p-->
+<!--Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue |
+    Select-Object LocalAddress,LocalPort,State,OwningProcess-->
+<!--Stop-Process -Id 11192 -Force
+    -->

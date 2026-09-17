@@ -70,6 +70,7 @@ public class AuthAndUserPhase8Test {
         req.setPhone("9876543210");
         req.setPassword("SecurePass123");
         req.setAge(25);
+        req.setGender("MALE");
         req.setBloodGroup("O+");
         req.setCity("Bengaluru");
 
@@ -149,6 +150,7 @@ public class AuthAndUserPhase8Test {
         req.setPhone("9876543210");
         req.setPassword("Pass12345");
         req.setAge(22);
+        req.setGender("MALE");
         req.setBloodGroup("A+");
         req.setCity("Pune");
 
@@ -294,6 +296,7 @@ public class AuthAndUserPhase8Test {
         sReq.setPhone("9876543210");
         sReq.setPassword("Password123");
         sReq.setAge(30);
+        sReq.setGender("MALE");
         sReq.setBloodGroup("B+");
         sReq.setCity("Chennai");
 
@@ -335,9 +338,8 @@ public class AuthAndUserPhase8Test {
     }
 
     @Test
-    public void testRegisterDonorWithoutGender_Success() {
+    public void testRegisterDonorWithoutGender_ThrowsException() {
         when(userRepository.existsByEmail("nogender@test.com")).thenReturn(false);
-        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
         SignupRequest req = new SignupRequest();
         req.setRole("donor");
@@ -350,11 +352,27 @@ public class AuthAndUserPhase8Test {
         req.setCity("Mumbai");
         req.setGender(null);
 
-        SignupResponse res = authService.registerUser(req);
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> authService.registerUser(req));
+        assertEquals("Gender is required", ex.getMessage());
+    }
 
-        assertNotNull(res);
-        assertNull(res.getGender());
-        verify(userRepository, times(1)).save(argThat(u -> u.getGender() == null));
+    @Test
+    public void testRegisterDonorWithInvalidGender_ThrowsException() {
+        when(userRepository.existsByEmail("invalidgender@test.com")).thenReturn(false);
+
+        SignupRequest req = new SignupRequest();
+        req.setRole("donor");
+        req.setName("Alex");
+        req.setEmail("invalidgender@test.com");
+        req.setPhone("9876543210");
+        req.setPassword("Password123");
+        req.setAge(24);
+        req.setBloodGroup("A+");
+        req.setCity("Mumbai");
+        req.setGender("OTHER");
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> authService.registerUser(req));
+        assertEquals("Gender must be MALE or FEMALE", ex.getMessage());
     }
 
     @Test
@@ -413,5 +431,62 @@ public class AuthAndUserPhase8Test {
         assertNotNull(updated);
         assertEquals("FEMALE", updated.getGender());
         assertEquals("FEMALE", user.getGender());
+    }
+
+    @Test
+    public void testUpdateProfile_InvalidGender_ThrowsException() {
+        User user = createSampleUser("d_102", "donor", "Donor", "donor102@test.com");
+        when(userRepository.findById("d_102")).thenReturn(Optional.of(user));
+
+        UpdateProfileRequest req = new UpdateProfileRequest();
+        req.setGender("UNKNOWN");
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> userService.updateUserProfile("d_102", req));
+        assertEquals("Gender must be MALE or FEMALE", ex.getMessage());
+    }
+
+    @Test
+    public void testDonorEligibility_Male_83DaysVs84Days() {
+        User male = createSampleUser("d_m", "donor", "Male Donor", "male@test.com");
+        male.setGender("MALE");
+
+        // 83 days ago -> ineligible
+        male.setLastDonation(java.time.LocalDate.now().minusDays(83).toString());
+        male.setNextEligibleDate(null);
+        assertFalse(male.isEligibleToDonate(), "Male donor should be ineligible 83 days after donation");
+
+        // 84 days ago -> eligible
+        male.setLastDonation(java.time.LocalDate.now().minusDays(84).toString());
+        male.setNextEligibleDate(null);
+        assertTrue(male.isEligibleToDonate(), "Male donor should be eligible on 84th day after donation");
+    }
+
+    @Test
+    public void testDonorEligibility_Female_111DaysVs112Days() {
+        User female = createSampleUser("d_f", "donor", "Female Donor", "female@test.com");
+        female.setGender("FEMALE");
+
+        // 111 days ago -> ineligible
+        female.setLastDonation(java.time.LocalDate.now().minusDays(111).toString());
+        female.setNextEligibleDate(null);
+        assertFalse(female.isEligibleToDonate(), "Female donor should be ineligible 111 days after donation");
+
+        // 112 days ago -> eligible
+        female.setLastDonation(java.time.LocalDate.now().minusDays(112).toString());
+        female.setNextEligibleDate(null);
+        assertTrue(female.isEligibleToDonate(), "Female donor should be eligible on 112th day after donation");
+    }
+
+    @Test
+    public void testDonorEligibility_RespectsExplicitNextEligibleDate() {
+        User donor = createSampleUser("d_exp", "donor", "Donor", "exp@test.com");
+        donor.setGender("FEMALE");
+        // lastDonation is 200 days ago, but nextEligibleDate is set to tomorrow
+        donor.setLastDonation(java.time.LocalDate.now().minusDays(200).toString());
+        donor.setNextEligibleDate(java.time.LocalDate.now().plusDays(1).toString());
+        assertFalse(donor.isEligibleToDonate(), "Stored nextEligibleDate must be respected");
+
+        donor.setNextEligibleDate(java.time.LocalDate.now().toString());
+        assertTrue(donor.isEligibleToDonate(), "Stored nextEligibleDate matching today must be eligible");
     }
 }

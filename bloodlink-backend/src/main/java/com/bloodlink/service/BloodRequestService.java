@@ -461,7 +461,7 @@ public class BloodRequestService {
                 continue;
             }
 
-            // Exclude ineligible donors in 90-day relaxation period
+            // Exclude ineligible donors in gender-based relaxation period (MALE: 84 days, FEMALE: 112 days)
             if (!isDonorEligible(donor, today)) {
                 continue;
             }
@@ -564,7 +564,7 @@ public class BloodRequestService {
                 continue; // Exclude suspended
             }
             if (!isDonorEligible(donor, today)) {
-                continue; // Exclude ineligible (90-day)
+                continue; // Exclude ineligible (gender-based resting period: MALE 84 days, FEMALE 112 days)
             }
             if (donor.getBloodGroup() != null && compatibleGroups.contains(donor.getBloodGroup())) {
                 candidatePool.add(donor);
@@ -745,11 +745,12 @@ public class BloodRequestService {
         rd.setConfirmedAt(LocalDateTime.now());
         requestDonorRepository.save(rd);
 
-        // Update donor last donation date and next eligible date (+90 days) in MySQL users table
+        // Update donor last donation date and next eligible date (+84 days for MALE, +112 days for FEMALE) in MySQL users table
         User donor = userRepository.findById(donorId).orElse(null);
         LocalDate today = LocalDate.now();
         String donationDate = today.toString();
-        String nextEligible = today.plusDays(90).toString();
+        int restingDays = (donor != null && "FEMALE".equalsIgnoreCase(donor.getGender())) ? 112 : 84;
+        String nextEligible = today.plusDays(restingDays).toString();
 
         if (donor != null) {
             donor.setLastDonation(donationDate);
@@ -996,7 +997,8 @@ public class BloodRequestService {
         } else if (donor.getLastDonation() != null && !donor.getLastDonation().trim().isEmpty()) {
             try {
                 LocalDate last = LocalDate.parse(donor.getLastDonation().trim());
-                LocalDate next = last.plusDays(90);
+                int restingDays = "FEMALE".equalsIgnoreCase(donor.getGender()) ? 112 : 84;
+                LocalDate next = last.plusDays(restingDays);
                 if (checkDate.isBefore(next)) {
                     return false;
                 }
@@ -1021,7 +1023,7 @@ public class BloodRequestService {
         // Fetch all active available donors from MySQL via repository query
         List<User> availableDonors = userRepository.findByRoleIgnoreCaseAndAvailableTrue("donor");
 
-        // Filter for donation eligibility (90-day relaxation period) & biological compatibility
+        // Filter for donation eligibility (gender-based resting period: MALE 84 days, FEMALE 112 days) & biological compatibility
         LocalDate today = LocalDate.now();
         Set<String> compatibleGroups = COMPAT_MAP.getOrDefault(bg, Collections.singleton(bg));
         List<User> compatibleDonors = new ArrayList<>();
@@ -1030,7 +1032,7 @@ public class BloodRequestService {
             if (Boolean.TRUE.equals(donor.getSuspended())) {
                 continue;
             }
-            // Check 90-day donation relaxation period
+            // Check gender-based donation resting period (MALE: 84 days, FEMALE: 112 days)
             if (!isDonorEligible(donor, today)) {
                 continue;
             }

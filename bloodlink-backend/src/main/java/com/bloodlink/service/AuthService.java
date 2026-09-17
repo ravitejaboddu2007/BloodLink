@@ -116,6 +116,14 @@ public class AuthService {
                 throw new IllegalArgumentException("Donor age must be between 18 and 65");
             }
 
+            if (req.getGender() == null || req.getGender().trim().isEmpty()) {
+                throw new IllegalArgumentException("Gender is required");
+            }
+            String gender = req.getGender().trim().toUpperCase();
+            if (!gender.equals("MALE") && !gender.equals("FEMALE")) {
+                throw new IllegalArgumentException("Gender must be MALE or FEMALE");
+            }
+
             if (req.getBloodGroup() == null || req.getBloodGroup().trim().isEmpty()) {
                 throw new IllegalArgumentException("Blood group is required");
             }
@@ -175,7 +183,7 @@ public class AuthService {
         user.setPasswordHash(passwordEncoder.encode(req.getPassword()));
         user.setPhone(req.getPhone().trim());
         user.setAge(req.getAge());
-        user.setGender(role.equals("donor") && req.getGender() != null && !req.getGender().trim().isEmpty() ? req.getGender().trim() : null);
+        user.setGender(role.equals("donor") && req.getGender() != null && !req.getGender().trim().isEmpty() ? req.getGender().trim().toUpperCase() : null);
         user.setBloodGroup(req.getBloodGroup() != null ? req.getBloodGroup().trim() : null);
         user.setCity(req.getCity() != null ? req.getCity().trim() : null);
         user.setState(req.getState() != null ? req.getState().trim() : null);

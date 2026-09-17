@@ -218,7 +218,7 @@ function dist(la1, lo1, la2, lo2) {
       Math.sin(d2 / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
-function elig(d, nextEligDate) {
+function elig(d, nextEligDate, gender) {
   if (!d)
     return {
       ok: true,
@@ -240,7 +240,9 @@ function elig(d, nextEligDate) {
           ? new Date(nextEligDate)
           : new Date(nextEligDate + "T00:00:00");
     } else {
-      nextDate = new Date(dDate.getTime() + 90 * 86400000);
+      const g = gender || (typeof CU !== "undefined" && CU ? CU.gender : null);
+      const gapDays = g === "FEMALE" ? 112 : 84;
+      nextDate = new Date(dDate.getTime() + gapDays * 86400000);
     }
     const now = new Date();
     const todayZero = new Date(
@@ -2318,7 +2320,7 @@ function renderDDash() {
     ([hist, alerts]) => {
       const pend = alerts.filter((a) => a.dStatus === "pending").length;
       const lastD = CU.lastDonation || getLastHist();
-      const r = elig(lastD, CU.nextEligibleDate);
+      const r = elig(lastD, CU.nextEligibleDate, CU.gender);
 
       $("d-stats").innerHTML = `
       <div class="sc"><div class="sc-n r">${hist.length}</div><div class="sc-l">Donations</div></div>
@@ -2472,7 +2474,7 @@ function updateAvailBtn() {
   if (!btn) return;
   sw.className = "tgl-sw" + (CU.available ? " on" : "");
   const lastD = CU.lastDonation || getLastHist();
-  const r = elig(lastD, CU.nextEligibleDate);
+  const r = elig(lastD, CU.nextEligibleDate, CU.gender);
   if (!r.ok) {
     lb.innerHTML = `<span style="color:var(--am-dark);font-weight:700">⏳ In Rest Period</span><div style="font-size:11px;color:var(--text-m);font-weight:500">Preference: ${CU.available ? "ON" : "OFF"}</div>`;
   } else {
@@ -2504,7 +2506,7 @@ function toggleAvail() {
       saveUser();
       updateAvailBtn();
       const lastD = CU.lastDonation || getLastHist();
-      const r = elig(lastD, CU.nextEligibleDate);
+      const r = elig(lastD, CU.nextEligibleDate, CU.gender);
       if (!r.ok) {
         toast(
           CU.available
@@ -2719,7 +2721,7 @@ async function renderDHistory() {
   if (!CU) return;
   const hist = await fetchDonationHistory(CU.id);
   const last = hist.length ? hist[0].date : "";
-  const e = elig(last);
+  const e = elig(last, CU.nextEligibleDate, CU.gender);
   $("d-hist-stats").innerHTML = `
     <div class="sc"><div class="sc-n r">${hist.length}</div><div class="sc-l">Donations</div></div>
     <div class="sc"><div class="sc-n">${last ? fmt(last) : "—"}</div><div class="sc-l">Last Donated</div></div>
@@ -2784,7 +2786,8 @@ function checkElig() {
     toast("Pick a date first", "err");
     return;
   }
-  const res = elig(d);
+  const g = typeof CU !== "undefined" && CU ? CU.gender : null;
+  const res = elig(d, null, g);
   r.className = "elig-res " + (res.ok ? "elig-ok" : "elig-no");
   r.style.display = "block";
   r.innerHTML = `<strong>${res.ok ? "✅ Eligible!" : "⏳ Not yet."}</strong> ${res.msg}`;
@@ -2819,7 +2822,7 @@ function renderDonorGuide() {
     .join("")}</div>
   <div class="guide-card"><div class="ctitle">💡 Tips</div><ul style="padding-left:20px;color:var(--text-m);font-size:13.5px;line-height:2.2">
     <li>Stay hydrated before and after donation</li><li>Eat iron-rich food beforehand</li>
-    <li>Wait 90 days between whole blood donations</li><li>Keep location coordinates updated</li>
+    <li>Whole blood donations require an 84-day gap for males and a 112-day gap for females</li><li>Keep location coordinates updated</li>
     <li>Upload blood test report — hospitals trust it</li></ul></div>`;
 }
 
@@ -2834,7 +2837,7 @@ function renderDProfile() {
 
   const freshInfo = getLocationFreshness(CU);
   const lastD = CU.lastDonation || getLastHist();
-  const r = elig(lastD, CU.nextEligibleDate);
+  const r = elig(lastD, CU.nextEligibleDate, CU.gender);
   const dpBadge = $("dp-status");
   if (dpBadge && dpBadge.parentNode) {
     const statusBadge = !r.ok
@@ -3114,7 +3117,7 @@ function clearSearch() {
   searchDonors();
 }
 function donorRow(d) {
-  const e = elig(d.lastDonation);
+  const e = elig(d.lastDonation, d.nextEligibleDate, d.gender);
   const fresh = getLocationFreshness(d);
   const ds =
     d._d != null && d._d < 900
@@ -3138,7 +3141,7 @@ function donorRow(d) {
 async function showDonorDetail(id) {
   const d = await getUser(id);
   if (!d || !d.id) return;
-  const e = elig(d.lastDonation),
+  const e = elig(d.lastDonation, d.nextEligibleDate, d.gender),
     ds = dist(CU.lat, CU.lng, d.lat, d.lng);
   const fresh = getLocationFreshness(d);
   $("donor-detail").innerHTML = `
@@ -4849,7 +4852,7 @@ function renderCompat(pfx) {
 const FAQS = [
   {
     q: "How often can I donate blood?",
-    a: "Whole blood: every 90 days. Platelets: every 7 days. Plasma: every 28 days.",
+    a: "Whole blood donations require an 84-day gap for males and a 112-day gap for females. Platelets: every 7 days. Plasma: every 28 days.",
   },
   {
     q: "What are the eligibility criteria?",

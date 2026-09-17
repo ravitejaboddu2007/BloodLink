@@ -213,6 +213,7 @@ public class JwtAndSpringSecurityTest {
         req.setPassword("Password123");
         req.setPhone("9123456780");
         req.setAge(24);
+        req.setGender("MALE");
         req.setBloodGroup("A+");
         req.setCity("Mumbai");
 

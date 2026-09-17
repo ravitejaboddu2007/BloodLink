@@ -169,7 +169,8 @@ public class User {
         if (lastDonation != null && !lastDonation.trim().isEmpty()) {
             try {
                 java.time.LocalDate last = java.time.LocalDate.parse(lastDonation.trim());
-                java.time.LocalDate next = last.plusDays(90);
+                int restingDays = "FEMALE".equalsIgnoreCase(this.gender) ? 112 : 84;
+                java.time.LocalDate next = last.plusDays(restingDays);
                 return !java.time.LocalDate.now().isBefore(next);
             } catch (Exception ignored) {}
         }

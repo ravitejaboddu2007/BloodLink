@@ -143,8 +143,9 @@ public class DonationHistoryServiceTest {
     }
 
     @Test
-    public void testCreateDonationSuccessAndUpdatesUserLastDonation() {
+    public void testCreateDonationSuccessAndUpdatesUserLastDonation_Male() {
         User donor = createDonor("d1", "John", "2025-10-01");
+        donor.setGender("MALE");
         when(userRepository.findById("d1")).thenReturn(Optional.of(donor));
 
         CreateDonationRequest req = new CreateDonationRequest("2026-02-15", "Apollo Hospital", 1, "Successful blood donation");
@@ -161,6 +162,22 @@ public class DonationHistoryServiceTest {
 
         verify(donationHistoryRepository, times(1)).save(any(DonationHistory.class));
         assertEquals("2026-02-15", donor.getLastDonation());
+        assertEquals("2026-05-10", donor.getNextEligibleDate(), "Male donor must be +84 days from donation date");
+        verify(userRepository, times(1)).save(donor);
+    }
+
+    @Test
+    public void testCreateDonationSuccessAndUpdatesUserLastDonation_Female() {
+        User donor = createDonor("d2", "Sarah", "2025-10-01");
+        donor.setGender("FEMALE");
+        when(userRepository.findById("d2")).thenReturn(Optional.of(donor));
+
+        CreateDonationRequest req = new CreateDonationRequest("2026-02-15", "Apollo Hospital", 1, "Successful blood donation");
+        DonationHistoryDTO created = donationHistoryService.createDonation("d2", req);
+
+        assertNotNull(created);
+        assertEquals("2026-02-15", donor.getLastDonation());
+        assertEquals("2026-06-07", donor.getNextEligibleDate(), "Female donor must be +112 days from donation date");
         verify(userRepository, times(1)).save(donor);
     }
 

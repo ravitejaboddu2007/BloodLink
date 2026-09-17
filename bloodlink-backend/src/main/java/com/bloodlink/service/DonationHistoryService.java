@@ -116,7 +116,8 @@ public class DonationHistoryService {
             user.setLastDonation(date);
             try {
                 java.time.LocalDate dDate = java.time.LocalDate.parse(date);
-                user.setNextEligibleDate(dDate.plusDays(90).toString());
+                int restingDays = "FEMALE".equalsIgnoreCase(user.getGender()) ? 112 : 84;
+                user.setNextEligibleDate(dDate.plusDays(restingDays).toString());
             } catch (Exception ignored) {}
             userRepository.save(user);
         }

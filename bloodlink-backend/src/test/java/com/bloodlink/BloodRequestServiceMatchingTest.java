@@ -241,7 +241,7 @@ public class BloodRequestServiceMatchingTest {
 
         LocalDateTime fresh = LocalDateTime.now().minusMinutes(5);
         
-        // Donor 1: Eligible (last donation > 90 days ago)
+        // Donor 1: Eligible (last donation past resting period: MALE 84 days / FEMALE 112 days)
         User d1 = createDonor("d1", "Eligible Donor", "A+", 28.62, 77.21, fresh, true);
         d1.setLastDonation(java.time.LocalDate.now().minusDays(95).toString());
         d1.setNextEligibleDate(java.time.LocalDate.now().minusDays(5).toString());

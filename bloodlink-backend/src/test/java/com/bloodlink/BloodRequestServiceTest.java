@@ -415,7 +415,7 @@ public class BloodRequestServiceTest {
     }
 
     @Test
-    public void testConfirmDonorSets90DayRelaxationAndRecordsDonation() {
+    public void testConfirmDonorSetsGenderBasedRelaxationAndRecordsDonation_Male() {
         User hospital = createHospitalUser("h1", "City Hospital", 16.5062, 80.6480);
         when(userRepository.findById("h1")).thenReturn(Optional.of(hospital));
 
@@ -423,6 +423,7 @@ public class BloodRequestServiceTest {
         donor.setId("d1");
         donor.setName("Ravi");
         donor.setRole("donor");
+        donor.setGender("MALE");
         donor.setBloodGroup("O+");
         donor.setAvailable(true);
         when(userRepository.findById("d1")).thenReturn(Optional.of(donor));
@@ -446,15 +447,55 @@ public class BloodRequestServiceTest {
         assertNotNull(result);
         assertEquals(1, result.getSecuredUnits());
 
-        // Verify donor last donation and next eligible date (+90 days)
+        // Verify donor last donation and next eligible date (+84 days for MALE)
         java.time.LocalDate today = java.time.LocalDate.now();
         assertEquals(today.toString(), donor.getLastDonation());
-        assertEquals(today.plusDays(90).toString(), donor.getNextEligibleDate());
-        assertFalse(donor.isEligibleToDonate(), "Donor must be temporarily ineligible within 90-day relaxation period");
+        assertEquals(today.plusDays(84).toString(), donor.getNextEligibleDate());
+        assertFalse(donor.isEligibleToDonate(), "Male donor must be temporarily ineligible within 84-day relaxation period");
 
         // Verify donation history record was saved in MySQL
         verify(donationHistoryRepository, times(1)).save(any(com.bloodlink.entity.DonationHistory.class));
         verify(userRepository, atLeastOnce()).save(donor);
+    }
+
+    @Test
+    public void testConfirmDonorSetsGenderBasedRelaxationAndRecordsDonation_Female() {
+        User hospital = createHospitalUser("h2", "Apex Hospital", 16.5062, 80.6480);
+        when(userRepository.findById("h2")).thenReturn(Optional.of(hospital));
+
+        User donor = new User();
+        donor.setId("d2");
+        donor.setName("Priya");
+        donor.setRole("donor");
+        donor.setGender("FEMALE");
+        donor.setBloodGroup("A+");
+        donor.setAvailable(true);
+        when(userRepository.findById("d2")).thenReturn(Optional.of(donor));
+
+        BloodRequest req = createMockRequest("req-2", "h2", "A+", 1, "emergency", "open");
+        when(bloodRequestRepository.findById("req-2")).thenReturn(Optional.of(req));
+
+        RequestDonor rd = new RequestDonor();
+        rd.setBloodRequest(req);
+        rd.setDonorId("d2");
+        rd.setAlertType("direct");
+        rd.setStatus("accepted");
+        rd.setRespondedAt(LocalDateTime.now());
+
+        when(requestDonorRepository.findByDonorIdAndBloodRequestId("d2", "req-2")).thenReturn(Optional.of(rd));
+        when(requestDonorRepository.findByBloodRequestId("req-2")).thenReturn(Collections.singletonList(rd));
+        when(requestBloodBankRepository.findByBloodRequestId("req-2")).thenReturn(Collections.emptyList());
+        when(bloodRequestRepository.save(any(BloodRequest.class))).thenAnswer(i -> i.getArgument(0));
+
+        BloodRequest result = bloodRequestService.confirmDonor("req-2", "d2", "h2");
+        assertNotNull(result);
+        assertEquals(1, result.getSecuredUnits());
+
+        // Verify female donor last donation and next eligible date (+112 days for FEMALE)
+        java.time.LocalDate today = java.time.LocalDate.now();
+        assertEquals(today.toString(), donor.getLastDonation());
+        assertEquals(today.plusDays(112).toString(), donor.getNextEligibleDate());
+        assertFalse(donor.isEligibleToDonate(), "Female donor must be temporarily ineligible within 112-day relaxation period");
     }
 
     @Test

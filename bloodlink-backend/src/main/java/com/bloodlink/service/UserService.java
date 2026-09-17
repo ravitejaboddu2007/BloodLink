@@ -92,7 +92,10 @@ public class UserService {
                 user.setAge(req.getAge());
             }
             if (req.getGender() != null) {
-                String g = req.getGender().trim();
+                String g = req.getGender().trim().toUpperCase();
+                if ("donor".equalsIgnoreCase(user.getRole()) && !g.isEmpty() && !g.equals("MALE") && !g.equals("FEMALE")) {
+                    throw new IllegalArgumentException("Gender must be MALE or FEMALE");
+                }
                 user.setGender(g.isEmpty() ? null : g);
             }
             if (req.getBloodGroup() != null && !req.getBloodGroup().trim().isEmpty()) {
@@ -144,7 +147,8 @@ public class UserService {
                 } else {
                     try {
                         java.time.LocalDate dDate = java.time.LocalDate.parse(req.getLastDonation().trim());
-                        user.setNextEligibleDate(dDate.plusDays(90).toString());
+                        int restingDays = "FEMALE".equalsIgnoreCase(user.getGender()) ? 112 : 84;
+                        user.setNextEligibleDate(dDate.plusDays(restingDays).toString());
                     } catch (Exception ignored) {}
                 }
             }

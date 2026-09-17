@@ -1202,7 +1202,7 @@ function doSignup(role) {
       setE("sd-age", "Donor age must be an integer between 18 and 65");
       ok = false;
     }
-    if (!gender || !["MALE", "FEMALE", "OTHER"].includes(gender)) {
+    if (!gender || !["MALE", "FEMALE"].includes(gender)) {
       setE("sd-gender", "Select your gender");
       ok = false;
     }

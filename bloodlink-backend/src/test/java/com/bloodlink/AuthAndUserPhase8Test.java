@@ -407,11 +407,11 @@ public class AuthAndUserPhase8Test {
         when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
         UpdateProfileRequest req = new UpdateProfileRequest();
-        req.setGender("OTHER");
+        req.setGender("FEMALE");
 
         UserProfileDTO updated = userService.updateUserProfile("d_101", req);
         assertNotNull(updated);
-        assertEquals("OTHER", updated.getGender());
-        assertEquals("OTHER", user.getGender());
+        assertEquals("FEMALE", updated.getGender());
+        assertEquals("FEMALE", user.getGender());
     }
 }

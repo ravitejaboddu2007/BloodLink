@@ -180,6 +180,11 @@ button,input,select,textarea{font-family:var(--font)}
 .inp:focus{border-color:var(--cr);box-shadow:0 0 0 3px rgba(192,21,42,.1)}
 .inp.hf:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(26,79,204,.1)}
 .inp.err{border-color:#EF4444!important;box-shadow:0 0 0 3px rgba(239,68,68,.1)!important}
+.inp-pass-wrap{position:relative;display:flex;align-items:center}
+.inp-pass-wrap .inp{padding-right:42px}
+.pass-toggle-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;padding:0;cursor:pointer;color:var(--text-m);display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:4px;transition:color var(--t);outline:none;user-select:none}
+.pass-toggle-btn:hover{color:var(--text)}
+.pass-toggle-btn:focus-visible{color:var(--text);outline:2px solid var(--cr);outline-offset:1px}
 .ferr{font-size:12px;color:#EF4444;margin-top:5px;display:none}
 .ferr.show{display:block}
 .fhint{font-size:12px;color:var(--text-l);margin-top:5px}

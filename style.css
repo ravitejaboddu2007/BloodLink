@@ -498,6 +498,8 @@ table tr:hover td{background:var(--border-l)}
   .nav-right>.btn:nth-child(1){right:86px}
   .nav-right>.btn:nth-child(2){right:14px}
   .nav-right .btn.sm{padding:6px 10px;font-size:12px}
+  .req-type-toggle{flex-direction:column}
+  .req-type-toggle>.btn{width:100%}
 }
 @media(min-width:769px){
   #bnav{display:none!important}

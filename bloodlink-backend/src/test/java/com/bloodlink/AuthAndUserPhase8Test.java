@@ -310,4 +310,108 @@ public class AuthAndUserPhase8Test {
         ResponseEntity<?> loginRes = authController.login(lReq);
         assertEquals(HttpStatus.OK, loginRes.getStatusCode());
     }
+
+    @Test
+    public void testRegisterDonorWithGender_Success() {
+        when(userRepository.existsByEmail("genderdonor@test.com")).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+
+        SignupRequest req = new SignupRequest();
+        req.setRole("donor");
+        req.setName("Priya Sharma");
+        req.setEmail("genderdonor@test.com");
+        req.setPhone("9876543210");
+        req.setPassword("Password123");
+        req.setAge(26);
+        req.setBloodGroup("O+");
+        req.setCity("Pune");
+        req.setGender("FEMALE");
+
+        SignupResponse res = authService.registerUser(req);
+
+        assertNotNull(res);
+        assertEquals("FEMALE", res.getGender());
+        verify(userRepository, times(1)).save(argThat(u -> "FEMALE".equals(u.getGender())));
+    }
+
+    @Test
+    public void testRegisterDonorWithoutGender_Success() {
+        when(userRepository.existsByEmail("nogender@test.com")).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+
+        SignupRequest req = new SignupRequest();
+        req.setRole("donor");
+        req.setName("Alex");
+        req.setEmail("nogender@test.com");
+        req.setPhone("9876543210");
+        req.setPassword("Password123");
+        req.setAge(24);
+        req.setBloodGroup("A+");
+        req.setCity("Mumbai");
+        req.setGender(null);
+
+        SignupResponse res = authService.registerUser(req);
+
+        assertNotNull(res);
+        assertNull(res.getGender());
+        verify(userRepository, times(1)).save(argThat(u -> u.getGender() == null));
+    }
+
+    @Test
+    public void testRegisterHospitalAndBloodBank_GenderRemainsNull() {
+        when(userRepository.existsByEmail("hospital_g@test.com")).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+
+        SignupRequest req = new SignupRequest();
+        req.setRole("hospital");
+        req.setName("City Hospital");
+        req.setEmail("hospital_g@test.com");
+        req.setPhone("9876543210");
+        req.setPassword("Password123");
+        req.setRegistrationNumber("HOSP-12345");
+        req.setCity("Delhi");
+        req.setGender("FEMALE"); // Should be ignored for hospital
+
+        SignupResponse res = authService.registerUser(req);
+
+        assertNotNull(res);
+        assertNull(res.getGender(), "Hospital user must not have gender");
+        verify(userRepository, times(1)).save(argThat(u -> u.getGender() == null));
+    }
+
+    @Test
+    public void testUserProfileAndLogin_ReturnsGender() {
+        User user = createSampleUser("d_100", "donor", "Ravi", "ravi@test.com");
+        user.setGender("MALE");
+        when(userRepository.findById("d_100")).thenReturn(Optional.of(user));
+        when(userRepository.findByEmailIgnoreCase("ravi@test.com")).thenReturn(Optional.of(user));
+
+        UserProfileDTO profile = userService.getUserProfile("d_100");
+        assertNotNull(profile);
+        assertEquals("MALE", profile.getGender());
+
+        LoginRequest lReq = new LoginRequest();
+        lReq.setEmail("ravi@test.com");
+        lReq.setPassword("password123");
+
+        LoginResponse loginRes = authService.loginUser(lReq);
+        assertNotNull(loginRes);
+        assertEquals("MALE", loginRes.getGender());
+    }
+
+    @Test
+    public void testUpdateProfile_UpdatesGender() {
+        User user = createSampleUser("d_101", "donor", "Legacy Donor", "legacy@test.com");
+        user.setGender(null); // Legacy donor without gender
+        when(userRepository.findById("d_101")).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+
+        UpdateProfileRequest req = new UpdateProfileRequest();
+        req.setGender("OTHER");
+
+        UserProfileDTO updated = userService.updateUserProfile("d_101", req);
+        assertNotNull(updated);
+        assertEquals("OTHER", updated.getGender());
+        assertEquals("OTHER", user.getGender());
+    }
 }

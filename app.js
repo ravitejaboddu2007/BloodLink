@@ -1087,6 +1087,7 @@ function clearSignupForms() {
   const donorFields = [
     "sd-name",
     "sd-age",
+    "sd-gender",
     "sd-email",
     "sd-phone",
     "sd-bg",
@@ -1165,6 +1166,7 @@ function doSignup(role) {
     const ids = [
       "sd-name",
       "sd-age",
+      "sd-gender",
       "sd-email",
       "sd-phone",
       "sd-bg",
@@ -1178,6 +1180,7 @@ function doSignup(role) {
     const name = gv("sd-name"),
       rawAge = gv("sd-age"),
       age = Number(rawAge),
+      gender = gv("sd-gender"),
       email = gv("sd-email"),
       phone = gv("sd-phone"),
       bg = gv("sd-bg"),
@@ -1197,6 +1200,10 @@ function doSignup(role) {
       age > 65
     ) {
       setE("sd-age", "Donor age must be an integer between 18 and 65");
+      ok = false;
+    }
+    if (!gender || !["MALE", "FEMALE", "OTHER"].includes(gender)) {
+      setE("sd-gender", "Select your gender");
       ok = false;
     }
     if (!email || !isValidEmail(email)) {
@@ -1250,6 +1257,7 @@ function doSignup(role) {
       role: "donor",
       name,
       age,
+      gender,
       email,
       phone,
       bloodGroup: bg,
@@ -2841,6 +2849,7 @@ function renderDProfile() {
   sv("dp-name", CU.name);
   sv("dp-phone", CU.phone || "");
   sv("dp-bg", CU.bloodGroup || "");
+  sv("dp-gender", CU.gender || "");
   sv("dp-age", CU.age || "");
   sv("dp-city", CU.city || "");
   sv("dp-state", CU.state || "");
@@ -2878,6 +2887,7 @@ function saveDonorProfile() {
   CU.name = gv("dp-name");
   CU.phone = gv("dp-phone");
   CU.bloodGroup = gv("dp-bg");
+  CU.gender = gv("dp-gender") || null;
   CU.age = +gv("dp-age");
   CU.city = gv("dp-city");
   CU.state = gv("dp-state");

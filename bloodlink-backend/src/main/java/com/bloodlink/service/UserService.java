@@ -33,6 +33,7 @@ public class UserService {
         dto.setEmail(user.getEmail());
         dto.setPhone(user.getPhone());
         dto.setAge(user.getAge());
+        dto.setGender(user.getGender());
         dto.setBloodGroup(user.getBloodGroup());
         dto.setCity(user.getCity());
         dto.setState(user.getState());
@@ -89,6 +90,10 @@ public class UserService {
             }
             if (req.getAge() != null) {
                 user.setAge(req.getAge());
+            }
+            if (req.getGender() != null) {
+                String g = req.getGender().trim();
+                user.setGender(g.isEmpty() ? null : g);
             }
             if (req.getBloodGroup() != null && !req.getBloodGroup().trim().isEmpty()) {
                 user.setBloodGroup(req.getBloodGroup().trim());

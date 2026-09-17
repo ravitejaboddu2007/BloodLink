@@ -28,6 +28,9 @@ public class User {
 
     private Integer age;
 
+    @Column(length = 20)
+    private String gender;
+
     @Column(name = "blood_group", length = 10)
     private String bloodGroup;
 
@@ -103,6 +106,9 @@ public class User {
 
     public Integer getAge() { return age; }
     public void setAge(Integer age) { this.age = age; }
+
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
     public String getBloodGroup() { return bloodGroup; }
     public void setBloodGroup(String bloodGroup) { this.bloodGroup = bloodGroup; }

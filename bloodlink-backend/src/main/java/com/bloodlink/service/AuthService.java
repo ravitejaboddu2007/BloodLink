@@ -175,6 +175,7 @@ public class AuthService {
         user.setPasswordHash(passwordEncoder.encode(req.getPassword()));
         user.setPhone(req.getPhone().trim());
         user.setAge(req.getAge());
+        user.setGender(role.equals("donor") && req.getGender() != null && !req.getGender().trim().isEmpty() ? req.getGender().trim() : null);
         user.setBloodGroup(req.getBloodGroup() != null ? req.getBloodGroup().trim() : null);
         user.setCity(req.getCity() != null ? req.getCity().trim() : null);
         user.setState(req.getState() != null ? req.getState().trim() : null);
@@ -218,6 +219,7 @@ public class AuthService {
         res.setEmail(user.getEmail());
         res.setPhone(user.getPhone());
         res.setAge(user.getAge());
+        res.setGender(user.getGender());
         res.setCity(user.getCity());
         res.setState(user.getState());
         res.setBloodGroup(user.getBloodGroup());
@@ -259,6 +261,7 @@ public class AuthService {
         res.setEmail(user.getEmail());
         res.setPhone(user.getPhone());
         res.setAge(user.getAge());
+        res.setGender(user.getGender());
         res.setCity(user.getCity());
         res.setState(user.getState());
         res.setBloodGroup(user.getBloodGroup());

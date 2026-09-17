@@ -7,6 +7,7 @@ public class SignupRequest {
     private String password;
     private String phone;
     private Integer age;
+    private String gender;
     private String bloodGroup;
     private String city;
     private String state;
@@ -38,6 +39,9 @@ public class SignupRequest {
 
     public Integer getAge() { return age; }
     public void setAge(Integer age) { this.age = age; }
+
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
     public String getBloodGroup() { return bloodGroup; }
     public void setBloodGroup(String bloodGroup) { this.bloodGroup = bloodGroup; }

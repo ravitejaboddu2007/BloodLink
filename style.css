@@ -483,8 +483,8 @@ table tr:hover td{background:var(--border-l)}
   .frow{grid-template-columns:1fr}
   #sidebar{transform:translateX(-100%)}
   #sidebar.open{transform:translateX(0)}
-  #main{margin-left:0;padding-bottom:80px}
-  #bnav{display:block}
+  #main{margin-left:0;padding-bottom:24px}
+  #bnav{display:none!important}
   .page{padding:20px 16px}
   .auth-wrap{grid-template-columns:1fr;max-width:460px}
   .auth-panel{display:none}

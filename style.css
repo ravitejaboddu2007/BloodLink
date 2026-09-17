@@ -490,6 +490,15 @@ table tr:hover td{background:var(--border-l)}
   .auth-panel{display:none}
   .mob-only{display:flex!important}
 }
+@media(max-width:540px){
+  .l-nav{display:flex;flex-direction:column;align-items:flex-start;height:auto;min-height:60px;padding:10px 14px;gap:8px;position:sticky;top:0}
+  .logo{height:32px;display:flex;align-items:center}
+  .nav-right{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .nav-right>.btn:nth-child(1),.nav-right>.btn:nth-child(2){position:absolute;top:10px}
+  .nav-right>.btn:nth-child(1){right:86px}
+  .nav-right>.btn:nth-child(2){right:14px}
+  .nav-right .btn.sm{padding:6px 10px;font-size:12px}
+}
 @media(min-width:769px){
   #bnav{display:none!important}
   .mob-only{display:none!important}

@@ -131,14 +131,44 @@ function toast(msg, type = "info") {
   }, 3000);
 }
 
+function parseServerDate(value) {
+  if (!value) return null;
+  if (value instanceof Date) {
+    return isNaN(value.getTime()) ? null : value;
+  }
+  if (typeof value === "number") {
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  if (typeof value === "string") {
+    const v = value.trim();
+    if (!v) return null;
+    // Pure date (YYYY-MM-DD) -> preserve calendar date without UTC shift
+    if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+      const d = new Date(v + "T12:00:00");
+      return isNaN(d.getTime()) ? null : d;
+    }
+    // Datetime that already includes timezone info (e.g., ends in 'Z' or +/-offset)
+    if (/[zZ]$|[+-]\d{2}(:?\d{2})?$/.test(v)) {
+      const d = new Date(v);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    // Server LocalDateTime without timezone (e.g., 2026-09-17T06:30:00 or 2026-09-17 06:30:00) -> treat as UTC
+    if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(v)) {
+      const d = new Date(v.replace(" ", "T") + "Z");
+      return isNaN(d.getTime()) ? null : d;
+    }
+    const d = new Date(v);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  return null;
+}
+
 function fmt(s) {
   if (!s) return "—";
   try {
-    const d =
-      typeof s === "string" && s.includes("T")
-        ? new Date(s)
-        : new Date(s + "T12:00:00");
-    if (isNaN(d.getTime())) return s;
+    const d = parseServerDate(s);
+    if (!d || isNaN(d.getTime())) return s;
     return d.toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "short",
@@ -150,7 +180,9 @@ function fmt(s) {
 }
 function ago(s) {
   if (!s) return "";
-  const d = (Date.now() - new Date(s)) / 1000;
+  const serverD = parseServerDate(s);
+  if (!serverD || isNaN(serverD.getTime())) return "";
+  const d = (Date.now() - serverD.getTime()) / 1000;
   if (d < 60) return "just now";
   if (d < 3600) return ~~(d / 60) + "m ago";
   if (d < 86400) return ~~(d / 3600) + "h ago";
@@ -380,8 +412,8 @@ function saveBloodBankInventory(bloodBankId, stock, lastUpdated) {
 function fmtDateTime(isoStr) {
   if (!isoStr) return "Not updated yet";
   try {
-    const d = new Date(isoStr);
-    if (isNaN(d.getTime())) return "Not updated yet";
+    const d = parseServerDate(isoStr);
+    if (!d || isNaN(d.getTime())) return "Not updated yet";
     const datePart = d.toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "short",
@@ -759,12 +791,14 @@ async function renderReviewsHub() {
       let dateStr = "";
       if (myReview.createdAt) {
         try {
-          const d = new Date(myReview.createdAt);
-          dateStr = d.toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          });
+          const d = parseServerDate(myReview.createdAt);
+          dateStr = d
+            ? d.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            : myReview.createdAt;
         } catch {
           dateStr = myReview.createdAt;
         }
@@ -842,12 +876,14 @@ async function renderReviewsHub() {
         let dateStr = "";
         if (rev.createdAt) {
           try {
-            const d = new Date(rev.createdAt);
-            dateStr = d.toLocaleDateString(undefined, {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            });
+            const d = parseServerDate(rev.createdAt);
+            dateStr = d
+              ? d.toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })
+              : rev.createdAt;
           } catch {
             dateStr = rev.createdAt;
           }
@@ -1486,7 +1522,8 @@ function getLocationFreshness(u) {
     };
   }
 
-  const updatedTime = new Date(u.locationUpdatedAt).getTime();
+  const serverD = parseServerDate(u.locationUpdatedAt);
+  const updatedTime = serverD ? serverD.getTime() : NaN;
   if (isNaN(updatedTime)) {
     return {
       status: "very_old",
@@ -2341,7 +2378,7 @@ function renderDDash() {
             meta: ago(a.createdAt),
           });
         });
-        items.sort((a, b) => new Date(b.t) - new Date(a.t));
+        items.sort((a, b) => (parseServerDate(b.t)?.getTime() || 0) - (parseServerDate(a.t)?.getTime() || 0));
         ac.innerHTML =
           items
             .slice(0, 5)
@@ -2476,7 +2513,8 @@ function triggerLocationUpdateOnAlertInteraction() {
 
   // If location is already fresh (< 5 mins), do not prompt again
   if (CU.locationUpdatedAt) {
-    const ageMs = now - new Date(CU.locationUpdatedAt).getTime();
+    const locD = parseServerDate(CU.locationUpdatedAt);
+    const ageMs = locD ? now - locD.getTime() : Infinity;
     if (ageMs >= 0 && ageMs < 5 * 60 * 1000) {
       return;
     }
@@ -2919,7 +2957,7 @@ function renderHDash() {
       })
       .join("");
     const rec = [...myR]
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .sort((a, b) => (parseServerDate(b.createdAt)?.getTime() || 0) - (parseServerDate(a.createdAt)?.getTime() || 0))
       .slice(0, 3);
     $("h-recent-req").innerHTML = rec.length
       ? rec.map((r) => reqCard(r, true)).join("")
@@ -2951,7 +2989,7 @@ function renderHDash() {
             });
           });
       });
-      items.sort((a, b) => new Date(b.t) - new Date(a.t));
+      items.sort((a, b) => (parseServerDate(b.t)?.getTime() || 0) - (parseServerDate(a.t)?.getTime() || 0));
       ac.innerHTML =
         items
           .slice(0, 6)
@@ -3298,8 +3336,14 @@ function sendRequest() {
     radius: selHR,
     requestType: reqType,
     reason: reqType === "SCHEDULED" ? reason.trim() : null,
-    operationTime: reqType === "SCHEDULED" && opTime ? opTime : null,
-    accumulationDeadline: reqType === "SCHEDULED" && deadline ? deadline : null,
+    operationTime:
+      reqType === "SCHEDULED" && opTime
+        ? new Date(opTime).toISOString().slice(0, 19)
+        : null,
+    accumulationDeadline:
+      reqType === "SCHEDULED" && deadline
+        ? new Date(deadline).toISOString().slice(0, 19)
+        : null,
   };
 
   apiFetch(`${API_BASE}/api/requests`, {
@@ -3660,7 +3704,7 @@ function showMatchResult(req, matchedBanks = []) {
 function renderHRequests() {
   fetchHospitalRequests(CU.id).then((myR) => {
     const sorted = [...myR].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      (a, b) => (parseServerDate(b.createdAt)?.getTime() || 0) - (parseServerDate(a.createdAt)?.getTime() || 0),
     );
     ["open", "fulfilled", "all"].forEach((s) => {
       const items = s === "all" ? sorted : sorted.filter((r) => r.status === s);

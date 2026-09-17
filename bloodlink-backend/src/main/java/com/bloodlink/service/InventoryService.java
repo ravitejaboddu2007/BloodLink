@@ -209,9 +209,30 @@ public class InventoryService {
             List<RequestBloodBank> matches = requestBloodBankRepository.findByBloodBankId(inv.getBloodBankId());
             for (RequestBloodBank rbb : matches) {
                 if ("accepted".equalsIgnoreCase(rbb.getResponseStatus()) && rbb.getReservedUnits() != null && rbb.getReservedUnits() > 0) {
-                    String bg = rbb.getBloodRequest() != null ? rbb.getBloodRequest().getBloodGroup() : null;
-                    if (bg != null && reservedStock.containsKey(bg)) {
-                        reservedStock.put(bg, reservedStock.get(bg) + rbb.getReservedUnits());
+                    boolean parsed = false;
+                    String json = rbb.getReservedGroupsJson();
+                    if (json != null && !json.trim().isEmpty() && !json.trim().equals("{}")) {
+                        try {
+                            Map<String, Integer> alloc = objectMapper.readValue(json, new TypeReference<Map<String, Integer>>() {});
+                            if (alloc != null && !alloc.isEmpty()) {
+                                for (Map.Entry<String, Integer> entry : alloc.entrySet()) {
+                                    String bg = entry.getKey();
+                                    Integer qty = entry.getValue();
+                                    if (bg != null && reservedStock.containsKey(bg) && qty != null && qty > 0) {
+                                        reservedStock.put(bg, reservedStock.get(bg) + qty);
+                                        parsed = true;
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            // JSON parsing failed, fallback to requested blood group below
+                        }
+                    }
+                    if (!parsed) {
+                        String bg = rbb.getBloodRequest() != null ? rbb.getBloodRequest().getBloodGroup() : null;
+                        if (bg != null && reservedStock.containsKey(bg)) {
+                            reservedStock.put(bg, reservedStock.get(bg) + rbb.getReservedUnits());
+                        }
                     }
                 }
             }
